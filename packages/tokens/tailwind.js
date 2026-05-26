@@ -1,7 +1,7 @@
-// Design tokens — ported from docs/design-source/the-count-v2/project/colors_and_type.css.
-// When you change a value here, mirror it into ./tailwind.js (see README).
+// Mirror of src/index.ts for Tailwind config consumption.
+// Keep values in sync with src/index.ts — they are the same tokens, two formats.
 
-export const colors = {
+const colors = {
   bg: {
     page: '#08090B',
     hero: '#0B1A14',
@@ -40,17 +40,16 @@ export const colors = {
     gradientTop:    'rgba(63,109,33,0.5)',
     gradientBottom: 'rgba(63,109,33,0.25)',
   },
-  /** Used by FormPill 'W' variant — exact source value */
   amberOnLightText: '#1A1408',
-} as const;
+};
 
-export const glass = {
+const glass = {
   standard: { top: 'rgba(255,255,255,0.025)', bottom: 'rgba(255,255,255,0.005)' },
   elevated: { top: 'rgba(255,255,255,0.035)', bottom: 'rgba(255,255,255,0.008)' },
-  hero:     { top: 'rgba(255,255,255,0.025)', bottom: 'rgba(255,255,255,0.005)' }, // layered over colors.bg.hero
-} as const;
+  hero:     { top: 'rgba(255,255,255,0.025)', bottom: 'rgba(255,255,255,0.005)' },
+};
 
-export const typography = {
+const typography = {
   fontSans: '"Söhne", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
   fontMono: '"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace',
   size: {
@@ -58,8 +57,8 @@ export const typography = {
     bodyEm: 13, body: 13, caption: 11, micro: 10,
   },
   weight: {
-    regular: '400' as const,
-    medium:  '500' as const,
+    regular: '400',
+    medium:  '500',
   },
   letterSpacing: {
     h1: -0.4, h2: -0.2, h3: -0.1,
@@ -68,30 +67,24 @@ export const typography = {
   lineHeight: {
     h1: 1.15, h2: 1.2, body: 1.55,
   },
-} as const;
+};
 
-export const spacing = {
+const spacing = {
   pageX: 20, pageY: 22, panel: 16,
   cardGap: 10, section: 22,
   gridTight: 5, gridLoose: 14,
-} as const;
+};
 
-export const radii = {
+const radii = {
   panel: 14, card: 12, inset: 10, pill: 7, full: 999,
-} as const;
+};
 
-export const motion = {
+const motion = {
   easeOutSharp: 'cubic-bezier(0.22, 1, 0.36, 1)',
   duration: { hover: 180, press: 150, sheet: 280, chart: 900 },
-} as const;
+};
 
-/**
- * Radial backdrop wash — two stacked layers.
- * In RN, rendered via expo-linear-gradient as a close approximation
- * (radial isn't supported by expo-linear-gradient; angled linear with
- * carefully placed stops is the V1 approach).
- */
-export const backdrop = {
+const backdrop = {
   amberHalo: {
     stops: [
       { offset: 0,    color: 'rgba(232,181,58,0.14)' },
@@ -106,30 +99,27 @@ export const backdrop = {
       { offset: 0.65, color: 'rgba(8,9,11,0)'      },
     ],
   },
-} as const;
+};
 
-/**
- * Outer-glow recipes used on featured glass and tier-coloured pills.
- * iOS: applied via shadowColor + shadowOpacity + shadowRadius.
- * Android: rendered as a sibling LinearGradient underlay (greyscale-only elevation
- *          can't tint, so we synthesise the halo).
- */
-export const glows = {
+const glows = {
   amber: {
-    /** Featured glass — CSS: 0 1px 24px rgba(232,181,58,0.04) */
     elev:     { color: '#E8B53A', radius: 24, opacity: 0.04 },
-    /** SafePill teal/amber + SignalBadge high — CSS: 0 0 8–10px rgba(...,0.10–0.12) */
     pillSoft: { color: '#E8B53A', radius: 10, opacity: 0.12 },
-    /** FormPill W gradient — CSS: 0 0 6px rgba(232,181,58,0.40) */
     formW:    { color: '#E8B53A', radius: 6,  opacity: 0.40 },
   },
   teal: {
     pillSoft: { color: '#5DCAA5', radius: 8,  opacity: 0.10 },
     hero:     { color: '#0F6E56', radius: 30, opacity: 0.10 },
   },
-} as const;
+};
 
-export type Colors = typeof colors;
-export type Spacing = typeof spacing;
-export type Radii = typeof radii;
-export type Typography = typeof typography;
+module.exports = {
+  colors,
+  glass,
+  typography,
+  spacing,
+  radii,
+  motion,
+  backdrop,
+  glows,
+};
