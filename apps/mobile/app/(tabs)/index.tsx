@@ -9,7 +9,7 @@
 // for content breathing room. Matches the design source's edge-of-screen rhythm.
 
 import type { ReactElement } from 'react';
-import { Image, Platform, ScrollView, Text, View } from 'react-native';
+import { Image, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   FeaturedMatch,
@@ -64,17 +64,7 @@ export default function HomeScreen(): ReactElement {
         >
           <Image
             source={require('../../assets/count-logo.png')}
-            style={[
-              { height: LOGO_HEIGHT, width: LOGO_WIDTH, marginLeft: -8 },
-              Platform.OS === 'ios'
-                ? {
-                    shadowColor: 'rgba(232,181,58,0.20)',
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowRadius: 14,
-                    shadowOpacity: 1,
-                  }
-                : null,
-            ]}
+            style={{ height: LOGO_HEIGHT, width: LOGO_WIDTH, marginLeft: -8 }}
             resizeMode="contain"
             accessibilityLabel="The Count"
           />
@@ -209,12 +199,20 @@ export default function HomeScreen(): ReactElement {
         <SectionHead label="SCAN ACROSS FIXTURES" tone="utility" />
         <View style={{ gap: 10 }}>
           <View style={{ flexDirection: 'row', gap: 10 }}>
-            <ScanCard icon="flag" title="High corners" sub="7 fixtures · 8+ floor" />
-            <ScanCard icon="card" title="Cards-heavy refs" sub="3 fixtures today" />
+            <View style={{ flex: 1 }}>
+              <ScanCard icon="flag" title="High corners" sub="7 fixtures · 8+ floor" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <ScanCard icon="card" title="Cards-heavy refs" sub="3 fixtures today" />
+            </View>
           </View>
           <View style={{ flexDirection: 'row', gap: 10 }}>
-            <ScanCard icon="target" title="Shots on target" sub="Player props · L5" />
-            <ScanCard icon="sparkles" title="Ask the AI" sub="Natural language" />
+            <View style={{ flex: 1 }}>
+              <ScanCard icon="target" title="Shots on target" sub="Player props · L5" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <ScanCard icon="sparkles" title="Ask the AI" sub="Natural language" />
+            </View>
           </View>
         </View>
       </ScrollView>
