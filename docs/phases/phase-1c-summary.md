@@ -91,6 +91,18 @@ These are intentional simplifications worth eyes-on review on a real device befo
 
 ---
 
+## Post-review fixes
+
+Three small fixes applied after the initial review:
+
+1. **SafeAreaView on the demo screen** (`apps/mobile/app/(tabs)/index.tsx`). Wrapped the `ScrollView` in `SafeAreaView` from `react-native-safe-area-context` with `edges={['top']}`. The page-background `<View>` and `<RadialBackdrop />` still render full-bleed; only the scrolling content is inset past the status bar / home indicator on iPhone.
+2. **Light status bar + forced dark navigation theme** (`apps/mobile/app/_layout.tsx`). Changed `<StatusBar style="auto" />` to `<StatusBar style="light" />`, hardcoded `ThemeProvider value={DarkTheme}`, and removed the now-unused `useColorScheme` import + `DefaultTheme` import. Count is always dark.
+3. **Arrow-left polyline corrected** (`packages/ui/src/components/Icon.tsx`). The source `atoms.jsx` had `points="12 19 5 12 12 19"` — the first and third points are identical, so only the bottom arm rendered. Updated to `"12 5 5 12 12 19"` to mirror `arrow-right`. Inline comment notes the source bug for future reference.
+
+Re-verified after these fixes: `pnpm typecheck` passes across all packages; `npx expo export --platform ios` bundles cleanly (1466 modules).
+
+---
+
 ## Verification
 
 - `pnpm typecheck` (all 7 packages): **passes, zero errors.**

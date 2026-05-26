@@ -1,4 +1,5 @@
 import { ScrollView, StatusBar, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   FormPill,
   GlassPanel,
@@ -26,101 +27,103 @@ export default function HomeScreen() {
     <View style={{ flex: 1, backgroundColor: colors.bg.page }}>
       <StatusBar barStyle="light-content" />
       <RadialBackdrop />
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: spacing.pageX,
-          paddingTop: spacing.pageY + 40,
-          paddingBottom: spacing.pageY + 80,
-          gap: spacing.section,
-        }}
-      >
-        <PageTitle />
+      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+        <ScrollView
+          contentContainerStyle={{
+            paddingHorizontal: spacing.pageX,
+            paddingTop: spacing.pageY + 40,
+            paddingBottom: spacing.pageY + 80,
+            gap: spacing.section,
+          }}
+        >
+          <PageTitle />
 
-        <Section title="GLASS PANELS">
-          <View style={{ gap: spacing.cardGap }}>
-            <GlassPanel variant="standard">
-              <PanelBody text="Standard glass panel" />
-            </GlassPanel>
-            <GlassPanel variant="elevated">
-              <PanelBody text="Elevated glass panel (amber rim, glow, keyline)" />
-            </GlassPanel>
-            <GlassPanel variant="hero">
-              <PanelBody text="Hero glass panel (deep teal-black, teal rim)" />
-            </GlassPanel>
-          </View>
-        </Section>
+          <Section title="GLASS PANELS">
+            <View style={{ gap: spacing.cardGap }}>
+              <GlassPanel variant="standard">
+                <PanelBody text="Standard glass panel" />
+              </GlassPanel>
+              <GlassPanel variant="elevated">
+                <PanelBody text="Elevated glass panel (amber rim, glow, keyline)" />
+              </GlassPanel>
+              <GlassPanel variant="hero">
+                <PanelBody text="Hero glass panel (deep teal-black, teal rim)" />
+              </GlassPanel>
+            </View>
+          </Section>
 
-        <Section title="SAFE PILLS">
-          <Row>
-            <SafePill threshold="8.5" hits={5} total={5} />
-            <SafePill threshold="8" hits={4} total={5} />
-            <SafePill threshold="7.5" hits={3} total={5} />
-          </Row>
-          <Row>
-            <SafePill threshold="8.5" hits={5} total={5} size="mini" />
-            <SafePill threshold="8" hits={4} total={5} size="mini" />
-            <SafePill threshold="7.5" hits={3} total={5} size="mini" />
-          </Row>
-          <Row>
-            <SafePill threshold="8.5" hits={5} total={5} addable />
-            <SafePill threshold="8" hits={4} total={5} addable />
-          </Row>
-        </Section>
+          <Section title="SAFE PILLS">
+            <Row>
+              <SafePill threshold="8.5" hits={5} total={5} />
+              <SafePill threshold="8" hits={4} total={5} />
+              <SafePill threshold="7.5" hits={3} total={5} />
+            </Row>
+            <Row>
+              <SafePill threshold="8.5" hits={5} total={5} size="mini" />
+              <SafePill threshold="8" hits={4} total={5} size="mini" />
+              <SafePill threshold="7.5" hits={3} total={5} size="mini" />
+            </Row>
+            <Row>
+              <SafePill threshold="8.5" hits={5} total={5} addable />
+              <SafePill threshold="8" hits={4} total={5} addable />
+            </Row>
+          </Section>
 
-        <Section title="SIGNAL BADGES">
-          <Row>
-            <SignalBadge score={92} />
-            <SignalBadge score={74} />
-            <SignalBadge score={58} />
-          </Row>
-          <Row>
-            <SignalMini score={92} />
-            <SignalMini score={74} />
-            <SignalMini score={58} />
-          </Row>
-        </Section>
+          <Section title="SIGNAL BADGES">
+            <Row>
+              <SignalBadge score={92} />
+              <SignalBadge score={74} />
+              <SignalBadge score={58} />
+            </Row>
+            <Row>
+              <SignalMini score={92} />
+              <SignalMini score={74} />
+              <SignalMini score={58} />
+            </Row>
+          </Section>
 
-        <Section title="FORM PILLS">
-          <Row>
-            <FormPill result="W" />
-            <FormPill result="D" />
-            <FormPill result="L" />
-            <FormPill result="W" />
-            <FormPill result="W" />
-            <FormPill result="L" />
-            <FormPill result="W" />
-          </Row>
-          <Row>
-            <FormPill result="L" />
-            <FormPill result="L" />
-            <FormPill result="D" />
-            <FormPill result="W" />
-            <FormPill result="W" />
-          </Row>
-        </Section>
+          <Section title="FORM PILLS">
+            <Row>
+              <FormPill result="W" />
+              <FormPill result="D" />
+              <FormPill result="L" />
+              <FormPill result="W" />
+              <FormPill result="W" />
+              <FormPill result="L" />
+              <FormPill result="W" />
+            </Row>
+            <Row>
+              <FormPill result="L" />
+              <FormPill result="L" />
+              <FormPill result="D" />
+              <FormPill result="W" />
+              <FormPill result="W" />
+            </Row>
+          </Section>
 
-        <Section title="SCORE PILLS">
-          <Row>
-            <ScorePill result="3-0" wdl="W" />
-            <ScorePill result="1-1" wdl="D" />
-            <ScorePill result="0-2" wdl="L" />
-          </Row>
-        </Section>
+          <Section title="SCORE PILLS">
+            <Row>
+              <ScorePill result="3-0" wdl="W" />
+              <ScorePill result="1-1" wdl="D" />
+              <ScorePill result="0-2" wdl="L" />
+            </Row>
+          </Section>
 
-        <Section title="ICONS">
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              rowGap: spacing.gridLoose,
-            }}
-          >
-            {ICON_NAMES.map((name) => (
-              <IconCell key={name} name={name} />
-            ))}
-          </View>
-        </Section>
-      </ScrollView>
+          <Section title="ICONS">
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                rowGap: spacing.gridLoose,
+              }}
+            >
+              {ICON_NAMES.map((name) => (
+                <IconCell key={name} name={name} />
+              ))}
+            </View>
+          </Section>
+        </ScrollView>
+      </SafeAreaView>
     </View>
   );
 }

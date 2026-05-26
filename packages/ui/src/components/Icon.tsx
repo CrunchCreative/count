@@ -125,7 +125,8 @@ export function Icon({
       return (
         <Svg {...svgProps}>
           <Line x1="19" y1="12" x2="5" y2="12" {...common} />
-          <Polyline points="12 19 5 12 12 19" {...common} />
+          {/* Source atoms.jsx had "12 19 5 12 12 19" — duplicate first/last point only rendered the bottom arm. Corrected to mirror arrow-right. */}
+          <Polyline points="12 5 5 12 12 19" {...common} />
         </Svg>
       );
     case 'flag':
