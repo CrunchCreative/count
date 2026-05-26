@@ -23,26 +23,17 @@ V1 must include: empty/loading/error states for every screen, age gate (17+ iOS,
 
 ## Current position
 
-**Done:** Phases 0, 0.5, 1A, 1B, 1C. Foundation, design system, atomic primitives. App boots on real iPhone via Expo Go. See PROJECT-STATE.md for detail.
+**Done:** Phases 0, 0.5, 1A, 1B, 1C, 2A, 2B. Foundation, design system, atomic primitives, app shell, full Dashboard. App boots on real iPhone via Expo Go with backdrop + glass panels + auto-advancing hero + 4-section content all rendering correctly. See PROJECT-STATE.md for detail.
 
-**Next:** Phase 2.
+**Next:** Phase 3.
 
-**Remaining work to V1:** ~8 phases, of which 5 are UI-with-mock-data (fast), 2 are data infrastructure (slow), 1 is AI integration, plus polish/submission.
+**Remaining work to V1:** ~7 phases, of which 3 are UI-with-mock-data (fast), 2 are data infrastructure (slow), 1 is AI integration, plus polish/submission.
 
 ---
 
 ## Phase plan
 
 Each phase is one Claude Code session unless flagged otherwise. Phases run sequentially unless marked parallelisable.
-
-### Phase 2 — Bottom nav + Dashboard screen
-
-Replace the React Navigation default tab bar with the custom 5-item glass nav (Home / Fixtures / Search / Builders / Profile). Build the Dashboard screen with all sections: header, featured fixture hero, date strip, fixture rows, "Strongest angles today," and the slip bar (empty state).
-
-**Depends on:** Phase 1C. ✓ done.
-**Probably needs:** team kit SVGs from `kit.jsx` ported into `@count/ui`. Fixture rows show kits.
-**Output:** A real Dashboard rendering against typed mock data, navigable bottom nav.
-**Effort:** 1 Claude Code session (~30–40 min). Possibly 2 if team kits get split out.
 
 ### Phase 2.5 — Sportmonks API spike
 
@@ -51,13 +42,19 @@ Nick, manual, 1 hour. Sign up for Sportmonks, get a trial API key, hit 3–5 end
 **Depends on:** nothing.
 **Output:** A short notes doc (`docs/sportmonks-spike.md`) summarising endpoint shapes and confirming assumptions.
 **Effort:** ~1 hour, Nick alone.
-**Parallelisable with:** Phase 2 or 3.
+**Parallelisable with:** Phase 3.
 
 ### Phase 3 — Fixture detail screen
 
 The match research screen with three tabs: Summary (insight-led), Matrix (the signature side-by-side comparison view), AI (conversational placeholder). All against mock data. The Matrix view is the product's signature interaction — this is the most important screen.
 
-**Depends on:** Phase 2 (uses bottom nav, same component vocabulary).
+**Includes:**
+- The tug-of-war chart that was deferred from Phase 2B's featured-match panel. Source reference: `docs/design-source/the-count-v2/project/styles.css` `.tow / .tow-bar / .tow-row`.
+- `/fixture/[id]` route — every `onPress` TODO in `(tabs)/index.tsx` from Phase 2B currently points at this route.
+
+**Brief discipline (lesson from Phase 2B):** The Matrix view is denser and more compound than anything in 2B. The 2B brief implied component flex/layout via "same as source" and Claude Code misread `ResearchCard`'s row-direction angle inset as column. For Phase 3, every compound component spec needs to state parent flex-direction, sibling order, and child sizing rules explicitly. Don't assume the agent can infer layout from the prototype.
+
+**Depends on:** Phase 2B. ✓ done.
 **Output:** Full fixture detail screen, navigable from a fixture row tap.
 **Effort:** 1–2 Claude Code sessions. The Matrix view alone is substantial.
 
@@ -67,7 +64,7 @@ Implement `@count/pattern-engine`. Pure TypeScript. Given a typed input (fixture
 
 **Why now:** the screens are built; we know exactly what outputs they consume. The engine isn't speculative.
 
-**Depends on:** Phases 2 + 3 (so we know what outputs are needed). Phase 2.5 ideally (so we know what input shapes Sportmonks delivers).
+**Depends on:** Phases 2B + 3 (so we know what outputs are needed). Phase 2.5 ideally (so we know what input shapes Sportmonks delivers).
 **Output:** A unit-tested deterministic engine that the mock data layer can adopt.
 **Effort:** 1 long Claude Code session. The engine maths matters more than the framing.
 
@@ -75,7 +72,7 @@ Implement `@count/pattern-engine`. Pure TypeScript. Given a typed input (fixture
 
 Search screen (preset filters, custom searches, AI search input placeholder). Builders screen (current builder being assembled, saved builders list, builder result detail with leg-by-leg outcome). All mock data.
 
-**Depends on:** Phases 2 and 3 (uses same primitives).
+**Depends on:** Phases 2B and 3 (uses same primitives).
 **Output:** All 5 primary screens of the app are now navigable with mock data. App is feature-complete-looking, just not data-real.
 **Effort:** 1–2 Claude Code sessions.
 
@@ -85,7 +82,7 @@ Search screen (preset filters, custom searches, AI search input placeholder). Bu
 
 Create the Supabase project (Nick, one-time, EU-west region). Implement auth flows (Apple Sign In, Google, magic link). Design and migrate the schema for users, saved fixtures, saved builders, saved searches. Wire `@count/api` with typed client functions.
 
-**Depends on:** Phases 2–5 (knows what data needs persisting).
+**Depends on:** Phases 2B–5 (knows what data needs persisting).
 **Output:** Real auth on real backend. Mock data still in use for fixtures/events; only user-owned data hits Supabase.
 **Effort:** 1–2 sessions. Auth flows are fiddly. Nick handles Supabase account + region setup.
 
@@ -117,6 +114,8 @@ AI-assisted builder generation. Natural-language search. Both routed through Sup
 
 Empty / loading / error states audited everywhere. Accessibility pass (VoiceOver, TalkBack, text scaling, contrast). Age gate. App Store / Play Store listing copy. Privacy policy. Terms. Test on multiple device sizes. App icons, splash screens, screenshots for store listings. EAS Build + EAS Submit configuration. First-submission shepherding through Apple's review (expect 2–3 weeks back-and-forth on a gambling-adjacent app).
 
+Includes deferred items: Android device pass (still pending from Phase 2A/2B), logo PNG re-export with proper glow bleed, font decision (Söhne licensed vs Inter).
+
 **Depends on:** Phase 9 (everything else is done).
 **Output:** Live on App Store and Google Play.
 **Effort:** 2–4 weeks elapsed, including review time. Submission alone is unpredictable.
@@ -125,7 +124,7 @@ Empty / loading / error states audited everywhere. Accessibility pass (VoiceOver
 
 ## Critical path
 
-Phases 2 → 3 → 4 → 5 are the UI-and-engine track. Phases 6 → 7 → 8 are the data track. Phase 9 layers on top. Phase 10 is the gate.
+Phases 3 → 4 → 5 are the remaining UI-and-engine track. Phases 6 → 7 → 8 are the data track. Phase 9 layers on top. Phase 10 is the gate.
 
 The longest single-task risk is Apple review on the first submission. The longest single-phase risk is Phase 7 (ingestion pipeline — Sportmonks rate limits and data shape mismatches are real and hard to predict).
 
