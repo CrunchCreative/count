@@ -32,6 +32,9 @@ const dotStaticStyle: ViewStyle = {
   borderRadius: 1,
 };
 
+const DOT_ACTIVE_COLOR = '#F2F0E8';
+const DOT_INACTIVE_COLOR = 'rgba(255,255,255,0.35)';
+
 export function HeroCarousel({ slides, onPress }: HeroCarouselProps): ReactElement | null {
   const [index, setIndex] = useState(0);
   const [epoch, setEpoch] = useState(0);
@@ -121,9 +124,10 @@ export function HeroCarousel({ slides, onPress }: HeroCarouselProps): ReactEleme
         </GlassPanel>
       </Pressable>
 
-      {/* Dots — explicit container with height, alignItems centre, and
-          opaque-ish inactive colour. If you don't see them, an ancestor is
-          clipping or the colors token is misresolving. */}
+      {/* Dots — visual is a plain View child of the Pressable. A childless
+          Pressable with state-callback style at 2px height was not painting
+          its backgroundColor reliably on iOS; splitting touch (Pressable)
+          from paint (View) is the deterministic shape. */}
       <View
         style={{
           height: 16,
@@ -143,16 +147,17 @@ export function HeroCarousel({ slides, onPress }: HeroCarouselProps): ReactEleme
               accessibilityRole="button"
               accessibilityLabel={`Go to slide ${i + 1} of ${n}`}
               hitSlop={10}
-              style={({ pressed }) => [
-                dotStaticStyle,
-                {
-                  backgroundColor: active
-                    ? '#F2F0E8'
-                    : 'rgba(255,255,255,0.35)',
-                },
-                pressed && { opacity: 0.7 },
-              ]}
-            />
+              style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+            >
+              <View
+                style={[
+                  dotStaticStyle,
+                  {
+                    backgroundColor: active ? DOT_ACTIVE_COLOR : DOT_INACTIVE_COLOR,
+                  },
+                ]}
+              />
+            </Pressable>
           );
         })}
       </View>

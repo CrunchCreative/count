@@ -75,7 +75,6 @@ export function GlassPanel({
       style={[
         { borderRadius: radius },
         spec.glow ? glowStyle(spec.glow) : null,
-        style,
       ]}
     >
       {spec.glow && shouldRenderAndroidGlow ? (
@@ -83,13 +82,16 @@ export function GlassPanel({
       ) : null}
 
       <View
-        style={{
-          borderRadius: radius,
-          borderWidth: StyleSheet.hairlineWidth,
-          borderColor: spec.border,
-          overflow: 'hidden',
-          backgroundColor: spec.fillsHero ? colors.bg.hero : 'transparent',
-        }}
+        style={[
+          {
+            borderRadius: radius,
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: spec.border,
+            overflow: 'hidden',
+            backgroundColor: spec.fillsHero ? colors.bg.hero : 'transparent',
+          },
+          style,
+        ]}
       >
         <LinearGradient
           colors={[tints.top, tints.bottom]}
