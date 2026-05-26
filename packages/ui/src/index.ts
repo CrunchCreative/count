@@ -11,6 +11,16 @@ export { FormPill } from './components/FormPill';
 export { ScorePill } from './components/ScorePill';
 export { Icon } from './components/Icon';
 
+// Multi-format primitives
+export { Kit } from './components/Kit';
+
+// Section / structural primitives
+export { SectionHead } from './components/SectionHead';
+
+// App-shell chrome
+export { BottomNav, BOTTOM_NAV_Z_INDEX } from './components/BottomNav';
+export { NotePadBar, NOTE_PAD_BAR_Z_INDEX } from './components/NotePadBar';
+
 // Type re-exports
 export type { GlassVariant, GlassPanelProps } from './components/GlassPanel';
 export type { KeylineGlowProps, KeylineTone } from './components/KeylineGlow';
@@ -20,3 +30,6 @@ export type { SignalMiniProps } from './components/SignalMini';
 export type { FormPillProps, FormResult } from './components/FormPill';
 export type { ScorePillProps, ScoreOutcome } from './components/ScorePill';
 export type { IconName, IconProps } from './components/Icon';
+export type { KitProps, KitVariant } from './components/Kit';
+export type { SectionHeadProps, SectionHeadTone } from './components/SectionHead';
+export type { BottomNavProps, BottomNavTab } from './components/BottomNav';

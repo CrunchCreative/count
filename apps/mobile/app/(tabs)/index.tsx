@@ -4,14 +4,17 @@ import {
   FormPill,
   GlassPanel,
   Icon,
+  Kit,
   RadialBackdrop,
   SafePill,
   ScorePill,
+  SectionHead,
   SignalBadge,
   SignalMini,
   type IconName,
 } from '@count/ui';
 import { colors, spacing, typography } from '@count/tokens';
+import { getTeam } from '@/src/mock/teams';
 
 const ICON_NAMES: IconName[] = [
   'chevron-left', 'chevron-right', 'chevron-up', 'chevron-down',
@@ -20,6 +23,26 @@ const ICON_NAMES: IconName[] = [
   'sparkles', 'target', 'card', 'arrows-h', 'bars', 'check',
   'info', 'plus', 'corner', 'x', 'x-circle', 'more', 'close',
   'layers', 'copy', 'duplicate', 'trash', 'check-circle', 'share',
+];
+
+// Twelve teams across leagues + pattern variety for the shirt strip
+const SHIRT_TEAM_CODES = [
+  'MCI', 'CRY', 'ARS', 'NEW', 'WOL', 'TOT',
+  'BAR', 'VIL', 'JUV', 'INT', 'BAY', 'PSG',
+];
+
+const MINI_TEAM_CODES = ['MCI', 'CRY', 'NEW', 'ARS', 'BAR', 'WOL', 'JUV', 'PSG'];
+
+// Yellow primary (WOL, VIL), white primary (TOT, RMA) verify the dark-text override
+const PLAYER_KIT_ENTRIES: { team: string; number: number }[] = [
+  { team: 'MCI', number: 9 },
+  { team: 'CRY', number: 11 },
+  { team: 'WOL', number: 7 },
+  { team: 'VIL', number: 10 },
+  { team: 'TOT', number: 22 },
+  { team: 'RMA', number: 5 },
+  { team: 'ARS', number: 14 },
+  { team: 'NEW', number: 4 },
 ];
 
 export default function HomeScreen() {
@@ -32,11 +55,73 @@ export default function HomeScreen() {
           contentContainerStyle={{
             paddingHorizontal: spacing.pageX,
             paddingTop: spacing.pageY + 40,
-            paddingBottom: spacing.pageY + 80,
-            gap: spacing.section,
+            // Clear the absolute-positioned NotePadBar + BottomNav at the bottom.
+            paddingBottom: 200,
           }}
         >
           <PageTitle />
+
+          <SectionHead label="TEAM KITS" tone="utility" meta="Shirts" />
+          <Row>
+            {SHIRT_TEAM_CODES.map((code) => {
+              const team = getTeam(code);
+              if (!team) return null;
+              return (
+                <View key={code} style={{ alignItems: 'center', gap: 4 }}>
+                  <Kit team={team} variant="shirt" size={26} />
+                  <CodeLabel code={team.code} />
+                </View>
+              );
+            })}
+          </Row>
+
+          <SectionHead label="KIT MINI" tone="utility" meta="8 × 9 inline" />
+          <Row>
+            {MINI_TEAM_CODES.map((code) => {
+              const team = getTeam(code);
+              if (!team) return null;
+              return (
+                <View key={code} style={{ alignItems: 'center', gap: 4 }}>
+                  <Kit team={team} variant="mini" />
+                  <CodeLabel code={team.code} />
+                </View>
+              );
+            })}
+          </Row>
+
+          <SectionHead
+            label="PLAYER KITS"
+            tone="engine"
+            meta="Square + number"
+          />
+          <Row>
+            {PLAYER_KIT_ENTRIES.map(({ team: code, number }) => {
+              const team = getTeam(code);
+              if (!team) return null;
+              return (
+                <View key={`${code}-${number}`} style={{ alignItems: 'center', gap: 4 }}>
+                  <Kit
+                    team={team}
+                    variant="square"
+                    playerNumber={number}
+                  />
+                  <CodeLabel code={team.code} />
+                </View>
+              );
+            })}
+          </Row>
+
+          <SectionHead
+            label="SECTION HEADS"
+            tone="utility"
+            meta="Both tones"
+          />
+          <SectionHead label="ENGINE TONE" tone="engine" meta="5/5 angles" />
+          <SectionHead label="UTILITY TONE" tone="utility" />
+
+          {/* Phase 1C demo content — kept below for cumulative reference. */}
+
+          <LegacyLabel text="PHASE 1C PRIMITIVES" />
 
           <Section title="GLASS PANELS">
             <View style={{ gap: spacing.cardGap }}>
@@ -92,13 +177,6 @@ export default function HomeScreen() {
               <FormPill result="L" />
               <FormPill result="W" />
             </Row>
-            <Row>
-              <FormPill result="L" />
-              <FormPill result="L" />
-              <FormPill result="D" />
-              <FormPill result="W" />
-              <FormPill result="W" />
-            </Row>
           </Section>
 
           <Section title="SCORE PILLS">
@@ -144,9 +222,44 @@ function PageTitle() {
   );
 }
 
+function CodeLabel({ code }: { code: string }) {
+  return (
+    <Text
+      style={{
+        color: colors.text.hint,
+        fontFamily: typography.fontMono,
+        fontSize: 9,
+        fontWeight: typography.weight.regular,
+        letterSpacing: 0.4,
+      }}
+    >
+      {code}
+    </Text>
+  );
+}
+
+function LegacyLabel({ text }: { text: string }) {
+  return (
+    <Text
+      style={{
+        marginTop: 28,
+        marginBottom: 4,
+        color: colors.text.faint,
+        fontFamily: typography.fontMono,
+        fontSize: typography.size.micro,
+        fontWeight: typography.weight.regular,
+        letterSpacing: typography.letterSpacing.metaMicro,
+        textTransform: 'uppercase',
+      }}
+    >
+      {text}
+    </Text>
+  );
+}
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <View style={{ gap: spacing.cardGap }}>
+    <View style={{ gap: spacing.cardGap, marginTop: spacing.section }}>
       <Text
         style={{
           color: colors.text.hint,

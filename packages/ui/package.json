@@ -12,18 +12,23 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@count/tokens": "workspace:*"
+    "@count/tokens": "workspace:*",
+    "@count/types": "workspace:*"
   },
   "peerDependencies": {
+    "expo-blur": "*",
     "expo-linear-gradient": "*",
     "nativewind": "^4.2.0",
     "react": ">=19",
     "react-native": ">=0.81",
+    "react-native-safe-area-context": "*",
     "react-native-svg": "*"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
+    "expo-blur": "~15.0.8",
     "expo-linear-gradient": "~15.0.8",
+    "react-native-safe-area-context": "~5.6.0",
     "react-native-svg": "15.12.1",
     "typescript": "^5.7.0"
   }

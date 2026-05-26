@@ -1,35 +1,62 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs, usePathname, useRouter, type Href } from 'expo-router';
+import { View } from 'react-native';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { BottomNav, NotePadBar, type BottomNavTab } from '@count/ui';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+const TABS: BottomNavTab[] = [
+  { key: 'index',    label: 'Home',     icon: 'home' },
+  { key: 'fixtures', label: 'Fixtures', icon: 'calendar' },
+  { key: 'search',   label: 'Search',   icon: 'search' },
+  { key: 'builders', label: 'Builders', icon: 'builders' },
+  { key: 'profile',  label: 'Profile',  icon: 'profile' },
+];
+
+const ROUTE_FOR_KEY: Record<string, Href> = {
+  index: '/',
+  fixtures: '/fixtures',
+  search: '/search',
+  builders: '/builders',
+  profile: '/profile',
+};
+
+function activeKeyFromPath(pathname: string): string {
+  if (pathname.endsWith('/fixtures')) return 'fixtures';
+  if (pathname.endsWith('/search')) return 'search';
+  if (pathname.endsWith('/builders')) return 'builders';
+  if (pathname.endsWith('/profile')) return 'profile';
+  return 'index';
+}
+
+function TabBar(_: BottomTabBarProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const activeKey = activeKeyFromPath(pathname);
+
+  // Single wrapper View — React Navigation's tabBar slot expects one
+  // measurable container, not a fragment. NotePadBar + BottomNav are both
+  // absolute-positioned children inside this wrapper.
+  return (
+    <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
+      <NotePadBar />
+      <BottomNav
+        tabs={TABS}
+        activeKey={activeKey}
+        onSelect={(key) => {
+          const route = ROUTE_FOR_KEY[key];
+          if (route) router.navigate(route);
+        }}
+      />
+    </View>
+  );
+}
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
+      tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+      }}
+    />
   );
 }
