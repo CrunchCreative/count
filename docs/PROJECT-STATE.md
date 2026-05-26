@@ -88,6 +88,7 @@ The current dev pattern:
 5. **We review the diff together** in chat — Nick pastes `git status`, `git diff --stat`, and the summary doc. We work through any issues.
 6. **Commit and push to `main`** when satisfied.
 7. **Test on a real device via Expo Go** (`npx expo start --tunnel` from `apps/mobile/`, scan QR with iPhone Camera app). Screenshots reviewed in chat for visual deltas.
+8. **Run `git status` before declaring a phase done.** Untracked files can hide between commits. A clean working tree is the only reliable signal that a phase is fully in version control. Phase 2B's "missing build artefacts" gap — where the four phase-2b commits all captured refinement edits but the mocks, types, new components, brief, and summary sat untracked for the whole phase — is the lesson. Always close a phase with `git status` returning *nothing to commit, working tree clean*.
 
 **Two-tool split that emerged in Phase 2B**: Claude Code for structural builds (large multi-file phases) and diagnostic-fix work (when bugs need live environment investigation with temporary debug markers, screenshots, and reasoning across multiple files). Claude.ai chat for surgical fixes (when the fix is precise enough that I can write the changed file in full and Nick can paste it in), strategic decisions, brief drafting, and review. Phase 2B refinement used both: chat-driven first (5 surgical files), then Claude Code with a diagnostic prompt for the three deeper rendering bugs that needed actual on-device investigation.
 
