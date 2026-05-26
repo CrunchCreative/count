@@ -1,332 +1,265 @@
-import { ScrollView, StatusBar, Text, View } from 'react-native';
+// Dashboard — Home tab. Ports docs/design-source/the-count-v2/project/screens/dashboard.jsx.
+// Branding header → hero carousel → greeting → today's row → featured match
+// (minus tug-of-war) → top research → pickup → scan.
+//
+// RadialBackdrop is rendered once at the root layout — not here.
+// Navigation to /fixture/[id] is stubbed until Phase 3 ships that route.
+//
+// Page horizontal padding: 12. Panels use their own 16-20px internal padding
+// for content breathing room. Matches the design source's edge-of-screen rhythm.
+
+import type { ReactElement } from 'react';
+import { Image, Platform, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
-  FormPill,
-  GlassPanel,
+  FeaturedMatch,
+  FixtureCard,
+  HeroCarousel,
+  HScroll,
   Icon,
-  Kit,
-  RadialBackdrop,
-  SafePill,
-  ScorePill,
+  IconButton,
+  PickupCard,
+  ResearchCard,
+  ScanCard,
   SectionHead,
-  SignalBadge,
-  SignalMini,
-  type IconName,
 } from '@count/ui';
-import { colors, spacing, typography } from '@count/tokens';
+import { colors, typography } from '@count/tokens';
+
+import { CAROUSEL } from '@/src/mock/carousel';
+import { TODAY } from '@/src/mock/fixtures';
+import { TOP_RESEARCH } from '@/src/mock/research';
+import { FEATURED } from '@/src/mock/featured';
 import { getTeam } from '@/src/mock/teams';
 
-const ICON_NAMES: IconName[] = [
-  'chevron-left', 'chevron-right', 'chevron-up', 'chevron-down',
-  'bookmark', 'search', 'bell', 'home', 'calendar', 'profile',
-  'builders', 'filter', 'arrow-right', 'arrow-left', 'flag',
-  'sparkles', 'target', 'card', 'arrows-h', 'bars', 'check',
-  'info', 'plus', 'corner', 'x', 'x-circle', 'more', 'close',
-  'layers', 'copy', 'duplicate', 'trash', 'check-circle', 'share',
-];
+const PAGE_X = 12;
 
-// Twelve teams across leagues + pattern variety for the shirt strip
-const SHIRT_TEAM_CODES = [
-  'MCI', 'CRY', 'ARS', 'NEW', 'WOL', 'TOT',
-  'BAR', 'VIL', 'JUV', 'INT', 'BAY', 'PSG',
-];
+// Logo natural dimensions: 3508 × 1363, aspect ratio ≈ 2.574. Rendered at height 50.
+const LOGO_NATURAL_W = 3508;
+const LOGO_NATURAL_H = 1363;
+const LOGO_HEIGHT = 50;
+const LOGO_WIDTH = LOGO_HEIGHT * (LOGO_NATURAL_W / LOGO_NATURAL_H);
 
-const MINI_TEAM_CODES = ['MCI', 'CRY', 'NEW', 'ARS', 'BAR', 'WOL', 'JUV', 'PSG'];
+export default function HomeScreen(): ReactElement {
+  const featuredHome = getTeam(FEATURED.home);
+  const featuredAway = getTeam(FEATURED.away);
 
-// Yellow primary (WOL, VIL), white primary (TOT, RMA) verify the dark-text override
-const PLAYER_KIT_ENTRIES: { team: string; number: number }[] = [
-  { team: 'MCI', number: 9 },
-  { team: 'CRY', number: 11 },
-  { team: 'WOL', number: 7 },
-  { team: 'VIL', number: 10 },
-  { team: 'TOT', number: 22 },
-  { team: 'RMA', number: 5 },
-  { team: 'ARS', number: 14 },
-  { team: 'NEW', number: 4 },
-];
-
-export default function HomeScreen() {
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bg.page }}>
-      <StatusBar barStyle="light-content" />
-      <RadialBackdrop />
-      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
-        <ScrollView
-          contentContainerStyle={{
-            paddingHorizontal: spacing.pageX,
-            paddingTop: spacing.pageY + 40,
-            // Clear the absolute-positioned NotePadBar + BottomNav at the bottom.
-            paddingBottom: 200,
+    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: PAGE_X,
+          paddingTop: 0,
+          paddingBottom: 200,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Branding header */}
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 16,
           }}
         >
-          <PageTitle />
-
-          <SectionHead label="TEAM KITS" tone="utility" meta="Shirts" />
-          <Row>
-            {SHIRT_TEAM_CODES.map((code) => {
-              const team = getTeam(code);
-              if (!team) return null;
-              return (
-                <View key={code} style={{ alignItems: 'center', gap: 4 }}>
-                  <Kit team={team} variant="shirt" size={26} />
-                  <CodeLabel code={team.code} />
-                </View>
-              );
-            })}
-          </Row>
-
-          <SectionHead label="KIT MINI" tone="utility" meta="8 × 9 inline" />
-          <Row>
-            {MINI_TEAM_CODES.map((code) => {
-              const team = getTeam(code);
-              if (!team) return null;
-              return (
-                <View key={code} style={{ alignItems: 'center', gap: 4 }}>
-                  <Kit team={team} variant="mini" />
-                  <CodeLabel code={team.code} />
-                </View>
-              );
-            })}
-          </Row>
-
-          <SectionHead
-            label="PLAYER KITS"
-            tone="engine"
-            meta="Square + number"
+          <Image
+            source={require('../../assets/count-logo.png')}
+            style={[
+              { height: LOGO_HEIGHT, width: LOGO_WIDTH, marginLeft: -8 },
+              Platform.OS === 'ios'
+                ? {
+                    shadowColor: 'rgba(232,181,58,0.20)',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowRadius: 14,
+                    shadowOpacity: 1,
+                  }
+                : null,
+            ]}
+            resizeMode="contain"
+            accessibilityLabel="The Count"
           />
-          <Row>
-            {PLAYER_KIT_ENTRIES.map(({ team: code, number }) => {
-              const team = getTeam(code);
-              if (!team) return null;
-              return (
-                <View key={`${code}-${number}`} style={{ alignItems: 'center', gap: 4 }}>
-                  <Kit
-                    team={team}
-                    variant="square"
-                    playerNumber={number}
-                  />
-                  <CodeLabel code={team.code} />
-                </View>
-              );
-            })}
-          </Row>
-
-          <SectionHead
-            label="SECTION HEADS"
-            tone="utility"
-            meta="Both tones"
-          />
-          <SectionHead label="ENGINE TONE" tone="engine" meta="5/5 angles" />
-          <SectionHead label="UTILITY TONE" tone="utility" />
-
-          {/* Phase 1C demo content — kept below for cumulative reference. */}
-
-          <LegacyLabel text="PHASE 1C PRIMITIVES" />
-
-          <Section title="GLASS PANELS">
-            <View style={{ gap: spacing.cardGap }}>
-              <GlassPanel variant="standard">
-                <PanelBody text="Standard glass panel" />
-              </GlassPanel>
-              <GlassPanel variant="elevated">
-                <PanelBody text="Elevated glass panel (amber rim, glow, keyline)" />
-              </GlassPanel>
-              <GlassPanel variant="hero">
-                <PanelBody text="Hero glass panel (deep teal-black, teal rim)" />
-              </GlassPanel>
-            </View>
-          </Section>
-
-          <Section title="SAFE PILLS">
-            <Row>
-              <SafePill threshold="8.5" hits={5} total={5} />
-              <SafePill threshold="8" hits={4} total={5} />
-              <SafePill threshold="7.5" hits={3} total={5} />
-            </Row>
-            <Row>
-              <SafePill threshold="8.5" hits={5} total={5} size="mini" />
-              <SafePill threshold="8" hits={4} total={5} size="mini" />
-              <SafePill threshold="7.5" hits={3} total={5} size="mini" />
-            </Row>
-            <Row>
-              <SafePill threshold="8.5" hits={5} total={5} addable />
-              <SafePill threshold="8" hits={4} total={5} addable />
-            </Row>
-          </Section>
-
-          <Section title="SIGNAL BADGES">
-            <Row>
-              <SignalBadge score={92} />
-              <SignalBadge score={74} />
-              <SignalBadge score={58} />
-            </Row>
-            <Row>
-              <SignalMini score={92} />
-              <SignalMini score={74} />
-              <SignalMini score={58} />
-            </Row>
-          </Section>
-
-          <Section title="FORM PILLS">
-            <Row>
-              <FormPill result="W" />
-              <FormPill result="D" />
-              <FormPill result="L" />
-              <FormPill result="W" />
-              <FormPill result="W" />
-              <FormPill result="L" />
-              <FormPill result="W" />
-            </Row>
-          </Section>
-
-          <Section title="SCORE PILLS">
-            <Row>
-              <ScorePill result="3-0" wdl="W" />
-              <ScorePill result="1-1" wdl="D" />
-              <ScorePill result="0-2" wdl="L" />
-            </Row>
-          </Section>
-
-          <Section title="ICONS">
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                rowGap: spacing.gridLoose,
+          <View style={{ flexDirection: 'row', gap: 6 }}>
+            <IconButton
+              icon="search"
+              accessibilityLabel="Search"
+              onPress={() => {
+                /* TODO: Phase 5 — router.push('/search') */
               }}
-            >
-              {ICON_NAMES.map((name) => (
-                <IconCell key={name} name={name} />
-              ))}
-            </View>
-          </Section>
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+            />
+            <IconButton
+              icon="bell"
+              accessibilityLabel="Notifications"
+              onPress={() => {
+                /* TODO: Phase TBD — notifications */
+              }}
+            />
+          </View>
+        </View>
+
+        {/* Hero carousel */}
+        <HeroCarousel slides={CAROUSEL} />
+
+        {/* Greeting */}
+        <View style={{ marginTop: 24 }}>
+          <Text style={metaStyle}>SATURDAY · 13 MAY</Text>
+          <Text style={greetingStyle}>Good morning, Ben</Text>
+          <Text style={greetingBodyStyle}>
+            14 fixtures today. The pattern engine has surfaced{' '}
+            <Text style={{ color: colors.teal.bright, fontWeight: typography.weight.medium }}>
+              11 strong angles
+            </Text>
+            {' '}with 5/5 hit rates across your followed leagues.
+          </Text>
+        </View>
+
+        {/* Today's fixtures */}
+        <SectionHead label="TODAY’S FIXTURES" tone="utility" meta="Premier League · 1 of 6" />
+        <HScroll
+          data={TODAY}
+          keyExtractor={(f) => f.id}
+          renderItem={(f) => {
+            const home = getTeam(f.home);
+            const away = getTeam(f.away);
+            const homeName = home?.name ?? f.home;
+            const awayName = away?.name ?? f.away;
+            const label = `${homeName} versus ${awayName}, ${f.kickoff}, signal ${f.signal}`;
+            return (
+              <FixtureCard
+                fixture={f}
+                accessibilityLabel={label}
+                onPress={() => {
+                  /* TODO: Phase 3 — router.push(`/fixture/${f.id}`) */
+                }}
+              />
+            );
+          }}
+        />
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 10,
+            marginTop: 12,
+          }}
+        >
+          <Icon name="chevron-left" size={12} color={colors.amber.bright} />
+          <Text style={hintRowStyle}>Swipe through 42 fixtures</Text>
+          <Icon name="chevron-right" size={12} color={colors.amber.bright} />
+        </View>
+
+        {/* Featured match */}
+        <SectionHead label="FEATURED MATCH" tone="engine" meta="Highest signal today" />
+        {featuredHome && featuredAway ? (
+          <FeaturedMatch
+            fixture={FEATURED}
+            homeTeam={featuredHome}
+            awayTeam={featuredAway}
+            onOpen={() => {
+              /* TODO: Phase 3 — router.push(`/fixture/${FEATURED.id}`) */
+            }}
+          />
+        ) : null}
+
+        {/* Top Research Today */}
+        <SectionHead label="TOP RESEARCH TODAY" tone="engine" meta="Ranked 2–4" />
+        <View style={{ gap: 12 }}>
+          {TOP_RESEARCH.map((r) => {
+            const home = getTeam(r.home);
+            const away = getTeam(r.away);
+            if (!home || !away) return null;
+            return (
+              <ResearchCard
+                key={r.id}
+                item={r}
+                homeTeam={home}
+                awayTeam={away}
+                onPress={() => {
+                  /* TODO: Phase 3 — router.push(`/fixture/${r.id}`) */
+                }}
+              />
+            );
+          })}
+        </View>
+
+        {/* Pick up where you left off — each card flex:1 inside the row. */}
+        <SectionHead label="PICK UP WHERE YOU LEFT OFF" tone="utility" />
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <View style={{ flex: 1 }}>
+            <PickupCard
+              meta="LAST VIEWED · 22 MIN AGO"
+              title="Newcastle vs Brighton"
+              sub="Player matrix · Last 5"
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <PickupCard
+              meta="SAVED BUILDER · YESTERDAY"
+              title="Weekend corner build"
+              sub={
+                <Text style={pickupAmberSubStyle}>
+                  +4.20 · 2 fixtures remaining
+                </Text>
+              }
+            />
+          </View>
+        </View>
+
+        {/* Scan across fixtures */}
+        <SectionHead label="SCAN ACROSS FIXTURES" tone="utility" />
+        <View style={{ gap: 10 }}>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <ScanCard icon="flag" title="High corners" sub="7 fixtures · 8+ floor" />
+            <ScanCard icon="card" title="Cards-heavy refs" sub="3 fixtures today" />
+          </View>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <ScanCard icon="target" title="Shots on target" sub="Player props · L5" />
+            <ScanCard icon="sparkles" title="Ask the AI" sub="Natural language" />
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
-function PageTitle() {
-  return (
-    <Text
-      style={{
-        color: colors.text.primary,
-        fontFamily: typography.fontSans,
-        fontSize: typography.size.h2,
-        fontWeight: typography.weight.medium,
-        letterSpacing: typography.letterSpacing.h2,
-      }}
-    >
-      Count — design primitives
-    </Text>
-  );
-}
+const metaStyle = {
+  color: colors.text.hint,
+  fontFamily: typography.fontMono,
+  fontSize: 10,
+  fontWeight: typography.weight.regular,
+  letterSpacing: 0.4,
+  textTransform: 'uppercase' as const,
+};
 
-function CodeLabel({ code }: { code: string }) {
-  return (
-    <Text
-      style={{
-        color: colors.text.hint,
-        fontFamily: typography.fontMono,
-        fontSize: 9,
-        fontWeight: typography.weight.regular,
-        letterSpacing: 0.4,
-      }}
-    >
-      {code}
-    </Text>
-  );
-}
+const greetingStyle = {
+  color: colors.text.primary,
+  fontFamily: typography.fontSans,
+  fontSize: 27,
+  fontWeight: typography.weight.medium,
+  letterSpacing: -0.4,
+  lineHeight: 27 * 1.15,
+  marginTop: 4,
+};
 
-function LegacyLabel({ text }: { text: string }) {
-  return (
-    <Text
-      style={{
-        marginTop: 28,
-        marginBottom: 4,
-        color: colors.text.faint,
-        fontFamily: typography.fontMono,
-        fontSize: typography.size.micro,
-        fontWeight: typography.weight.regular,
-        letterSpacing: typography.letterSpacing.metaMicro,
-        textTransform: 'uppercase',
-      }}
-    >
-      {text}
-    </Text>
-  );
-}
+const greetingBodyStyle = {
+  color: colors.text.secondary,
+  fontFamily: typography.fontSans,
+  fontSize: 13,
+  fontWeight: typography.weight.regular,
+  lineHeight: 13 * 1.55,
+  marginTop: 6,
+};
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <View style={{ gap: spacing.cardGap, marginTop: spacing.section }}>
-      <Text
-        style={{
-          color: colors.text.hint,
-          fontFamily: typography.fontMono,
-          fontSize: typography.size.micro,
-          fontWeight: typography.weight.regular,
-          letterSpacing: typography.letterSpacing.metaMicro,
-          textTransform: 'uppercase',
-        }}
-      >
-        {title}
-      </Text>
-      {children}
-    </View>
-  );
-}
+const hintRowStyle = {
+  color: colors.text.muted,
+  fontFamily: typography.fontSans,
+  fontSize: 11,
+  fontWeight: typography.weight.regular,
+};
 
-function Row({ children }: { children: React.ReactNode }) {
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        columnGap: spacing.gridLoose,
-        rowGap: spacing.gridTight,
-      }}
-    >
-      {children}
-    </View>
-  );
-}
-
-function PanelBody({ text }: { text: string }) {
-  return (
-    <View style={{ padding: spacing.panel }}>
-      <Text
-        style={{
-          color: colors.text.secondary,
-          fontFamily: typography.fontSans,
-          fontSize: typography.size.body,
-          fontWeight: typography.weight.regular,
-          lineHeight: typography.size.body * typography.lineHeight.body,
-        }}
-      >
-        {text}
-      </Text>
-    </View>
-  );
-}
-
-function IconCell({ name }: { name: IconName }) {
-  return (
-    <View style={{ width: '16.6%', alignItems: 'center', gap: 4 }}>
-      <Icon name={name} size={18} color={colors.text.secondary} />
-      <Text
-        style={{
-          color: colors.text.hint,
-          fontFamily: typography.fontMono,
-          fontSize: typography.size.micro,
-          fontWeight: typography.weight.regular,
-          letterSpacing: typography.letterSpacing.metaMicro,
-        }}
-        numberOfLines={1}
-      >
-        {name}
-      </Text>
-    </View>
-  );
-}
+const pickupAmberSubStyle = {
+  color: colors.amber.bright,
+  fontFamily: typography.fontSans,
+  fontSize: 11,
+  fontWeight: typography.weight.regular,
+};
