@@ -1,0 +1,23 @@
+{
+  "name": "count",
+  "version": "0.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20.19.4",
+    "pnpm": ">=10"
+  },
+  "packageManager": "pnpm@10.32.1",
+  "scripts": {
+    "dev": "pnpm --filter @count/mobile start",
+    "ios": "pnpm --filter @count/mobile ios",
+    "android": "pnpm --filter @count/mobile android",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.4.0",
+    "typescript": "^5.7.0"
+  }
+}
