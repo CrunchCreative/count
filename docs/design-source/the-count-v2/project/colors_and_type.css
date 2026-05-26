@@ -1,0 +1,255 @@
+/* ===================================================================
+   THE COUNT — DESIGN TOKENS
+   Use this file as the canonical source of CSS custom properties.
+   The full live stylesheet (`styles.css`) consumes everything declared here.
+   =================================================================== */
+
+:root {
+  /* ─────────────────────────────────────────────
+     BACKGROUNDS
+     ───────────────────────────────────────────── */
+  --bg-page: #08090B;              /* page (near-black, slight cool tint) */
+  --bg-hero: #0B1A14;              /* deep teal-black behind featured */
+  --bg-inset: rgba(0,0,0,0.20);    /* darker pocket inside lighter panel */
+
+  /* ─────────────────────────────────────────────
+     GLASS — surface gradients
+     ───────────────────────────────────────────── */
+  --glass-std-top:  rgba(255,255,255,0.025);
+  --glass-std-bot:  rgba(255,255,255,0.005);
+  --glass-elev-top: rgba(255,255,255,0.035);
+  --glass-elev-bot: rgba(255,255,255,0.008);
+
+  /* ─────────────────────────────────────────────
+     PRIMARY ACCENT — AMBER
+     Dominant data, primary stats, active states, CTAs
+     ───────────────────────────────────────────── */
+  --amber-bright: #E8B53A;
+  --amber-light:  #F1C455;
+  --amber-mid:    #BA7517;
+  --amber-deep:   #854F0B;
+
+  /* ─────────────────────────────────────────────
+     SECONDARY ACCENT — TEAL
+     Success states, "bulletproof" 5/5 patterns, positive secondary signals
+     ───────────────────────────────────────────── */
+  --teal-bright: #5DCAA5;
+  --teal-mid:    #1D9E75;
+  --teal-deep:   #0F6E56;
+
+  /* ─────────────────────────────────────────────
+     LOSS / RED — used sparingly for L scorelines, missed legs
+     ───────────────────────────────────────────── */
+  --loss-text:    #F09595;
+  --loss-border:  rgba(180,55,55,0.35);
+
+  /* ─────────────────────────────────────────────
+     TEXT — warm off-whites + grey ladder
+     ───────────────────────────────────────────── */
+  --t-pri:   #F2F0E8;
+  --t-sec:   #E8E6DF;
+  --t-mut:   #9A9890;
+  --t-hint:  #7A7870;
+  --t-faint: #5A5852;
+
+  /* ─────────────────────────────────────────────
+     BORDERS
+     ───────────────────────────────────────────── */
+  --b-def: rgba(255,255,255,0.06);  /* default 0.5px */
+  --b-str: rgba(255,255,255,0.10);  /* stronger */
+  --b-fai: rgba(255,255,255,0.04);  /* faintest */
+
+  /* ─────────────────────────────────────────────
+     SCORELINE PILLS — semantic
+     ───────────────────────────────────────────── */
+  --win-bg: linear-gradient(180deg, rgba(63,109,33,0.5) 0%, rgba(63,109,33,0.25) 100%);
+  --win-border: rgba(99,153,34,0.35);
+  --win-text: #C0DD97;
+
+  /* ─────────────────────────────────────────────
+     TYPOGRAPHY
+     ───────────────────────────────────────────── */
+  --font-sans: "Söhne", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Type scale (px). Multiply by --type-scale for density tweaks. */
+  --type-scale: 1;
+
+  /* Sizes — apply via calc(<base> * var(--type-scale)) */
+  --t-h1:        27px;  /* fixture name / page title; 500; -0.4px LS; lh 1.15 */
+  --t-h2:        22px;  /* screen section title; 500; -0.2px LS; lh 1.2 */
+  --t-h3:        14px;  /* panel header; 500 */
+  --t-body-em:   13px;  /* body emphasis; 500 */
+  --t-body:      13px;  /* body; 400; lh 1.55 */
+  --t-caption:   11px;  /* caption; 400 */
+  --t-micro:     10px;  /* uppercase meta; mono; 0.4px LS */
+
+  /* ─────────────────────────────────────────────
+     SPACING
+     ───────────────────────────────────────────── */
+  --s-page-x:    20px;
+  --s-page-y:    22px;
+  --s-panel:     16px;
+  --s-card-gap:  10px;
+  --s-section:   22px;
+  --s-grid-tight: 5px;
+  --s-grid-loose: 14px;
+
+  /* ─────────────────────────────────────────────
+     CORNER RADII
+     ───────────────────────────────────────────── */
+  --r-panel:  14px;  /* large panels */
+  --r-card:   12px;  /* medium cards */
+  --r-inset:  10px;  /* small inset / sub-cards (9–11px range) */
+  --r-pill:   7px;   /* buttons + chips (6–8px) */
+  --r-full:   999px; /* signal badges / form pills */
+
+  /* ─────────────────────────────────────────────
+     ELEVATION / SHADOWS
+     ───────────────────────────────────────────── */
+  --sh-glass:
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    inset 0 0 0 0.5px rgba(255,255,255,0.05);
+  --sh-elev:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    inset 0 0 0 0.5px rgba(255,255,255,0.06),
+    0 0 0 0.5px rgba(232,181,58,0.12),
+    0 1px 24px rgba(232,181,58,0.04);
+  --sh-amber-glow:    0 0 12px rgba(232,181,58,0.10);
+  --sh-teal-glow:     0 0 12px rgba(93,202,165,0.10);
+
+  /* ─────────────────────────────────────────────
+     RADIAL BACKDROP (the signature ambient wash)
+     ───────────────────────────────────────────── */
+  --bg-radial:
+    radial-gradient(ellipse 90% 50% at 50% 0%,
+      rgba(232,181,58,0.14) 0%,
+      rgba(232,181,58,0.06) 28%,
+      rgba(29,110,86,0.04) 55%,
+      rgba(8,9,11,0) 75%),
+    radial-gradient(circle 60% at 90% 95%,
+      rgba(29,110,86,0.10) 0%,
+      rgba(8,9,11,0) 65%);
+
+  /* ─────────────────────────────────────────────
+     MOTION
+     ───────────────────────────────────────────── */
+  --ease-out-sharp: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-hover:  0.18s;
+  --dur-press:  0.15s;
+  --dur-sheet:  0.28s;
+  --dur-chart:  0.9s;
+}
+
+
+/* ===================================================================
+   SEMANTIC TYPE STYLES
+   Apply directly. Use these rather than inline font-size / weight.
+   =================================================================== */
+
+.tc-h1 {
+  font-family: var(--font-sans);
+  font-size: calc(var(--t-h1) * var(--type-scale));
+  font-weight: 500;
+  letter-spacing: -0.4px;
+  line-height: 1.15;
+  color: var(--t-pri);
+  margin: 0;
+}
+
+.tc-h2 {
+  font-family: var(--font-sans);
+  font-size: calc(var(--t-h2) * var(--type-scale));
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+  color: var(--t-pri);
+  margin: 0;
+}
+
+.tc-h3 {
+  font-family: var(--font-sans);
+  font-size: calc(var(--t-h3) * var(--type-scale));
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  color: var(--t-pri);
+  margin: 0;
+}
+
+.tc-body {
+  font-family: var(--font-sans);
+  font-size: calc(var(--t-body) * var(--type-scale));
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--t-sec);
+}
+
+.tc-body-em {
+  font-family: var(--font-sans);
+  font-size: calc(var(--t-body-em) * var(--type-scale));
+  font-weight: 500;
+  color: var(--t-pri);
+}
+
+.tc-cap {
+  font-family: var(--font-sans);
+  font-size: calc(var(--t-caption) * var(--type-scale));
+  font-weight: 400;
+  color: var(--t-mut);
+}
+
+.tc-micro,
+.tc-meta {
+  font-family: var(--font-mono);
+  font-size: calc(var(--t-micro) * var(--type-scale));
+  font-weight: 400;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--t-hint);
+  white-space: nowrap;
+}
+
+.tc-section-label {
+  font-family: var(--font-sans);
+  font-size: calc(var(--t-caption) * var(--type-scale));
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tc-section-label.engine  { color: var(--teal-bright); }
+.tc-section-label.utility { color: var(--t-mut); }
+
+
+/* ===================================================================
+   SEMANTIC SURFACE STYLES
+   =================================================================== */
+
+.glass {
+  position: relative;
+  background: linear-gradient(180deg, var(--glass-std-top) 0%, var(--glass-std-bot) 100%);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-glass);
+}
+
+.glass.elev {
+  background: linear-gradient(180deg, var(--glass-elev-top) 0%, var(--glass-elev-bot) 100%);
+  box-shadow: var(--sh-elev);
+}
+
+.glass.hero {
+  background: linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.005) 100%), var(--bg-hero);
+  box-shadow:
+    inset 0 1px 0 rgba(93,202,165,0.10),
+    inset 0 0 0 0.5px rgba(93,202,165,0.10),
+    0 0 0 0.5px rgba(93,202,165,0.08),
+    0 1px 30px rgba(15,110,86,0.10);
+}
+
+.bg-gradients {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: var(--bg-radial);
+}

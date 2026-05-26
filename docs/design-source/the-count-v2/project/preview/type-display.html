@@ -1,0 +1,38 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../styles.css"/>
+<style>
+  html, body { margin:0; background:#08090B; height:100%; }
+  .preview-card {
+    position: relative;
+    width: 100%;
+    min-height: 200px;
+    padding: 20px 22px;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    color: var(--t-pri);
+    overflow: hidden;
+  }
+  .preview-card .bg-gradients {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,181,58,0.08) 0%, transparent 60%),
+      radial-gradient(circle 60% at 90% 100%, rgba(29,110,86,0.06) 0%, transparent 65%);
+  }
+  .preview-card > .content { position: relative; z-index: 1; }
+  
+</style>
+</head><body>
+<div class="preview-card">
+  <div class="bg-gradients"></div>
+  <div class="content">
+      <h1 class="tc-h1">Man City vs Crystal Palace</h1>
+      <h2 class="tc-h2" style="margin-top: 12px">Team matrix</h2>
+      <p class="tc-body" style="margin-top: 8px; color: var(--t-mut)">Sub-line at body / 13px / 400 / line-height 1.55.</p>
+    </div>
+</div>
+</body></html>

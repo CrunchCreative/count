@@ -1,0 +1,83 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../styles.css"/>
+<style>
+  html, body { margin:0; background:#08090B; height:100%; }
+  .preview-card {
+    position: relative;
+    width: 100%;
+    min-height: 180px;
+    padding: 20px 22px;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    color: var(--t-pri);
+    overflow: hidden;
+  }
+  .preview-card .bg-gradients {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,181,58,0.08) 0%, transparent 60%),
+      radial-gradient(circle 60% at 90% 100%, rgba(29,110,86,0.06) 0%, transparent 65%);
+  }
+  .preview-card > .content { position: relative; z-index: 1; }
+  
+</style>
+</head><body>
+<div class="preview-card">
+  <div class="bg-gradients"></div>
+  <div class="content">
+      <div class="tc-cap" style="margin-bottom: 12px; color: var(--t-mut)">Bar tier colour vocabulary · 60%+ teal · 40–60% amber · &lt; 40% muted</div>
+      <div style="display:flex;flex-direction:column;gap:9px;max-width: 480px">
+        
+          <div style="display:grid;grid-template-columns:80px 1fr 40px;align-items:center;gap:10px">
+            <span style="font-size: 12px; color: var(--t-sec); font-weight: 500">Corners</span>
+            <div style="position:relative;height:16px;border-radius:4px;background:rgba(255,255,255,0.03);overflow:hidden">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:72%;border-radius:4px;
+                background:linear-gradient(90deg, var(--teal-deep), var(--teal-bright));
+                box-shadow:0 0 8px rgba(93,202,165,0.30), inset 0 1px 0 rgba(255,255,255,0.18);
+              "></div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:12px;text-align:right;font-weight:500;color:var(--teal-bright)">72%</span>
+          </div>
+        
+          <div style="display:grid;grid-template-columns:80px 1fr 40px;align-items:center;gap:10px">
+            <span style="font-size: 12px; color: var(--t-sec); font-weight: 500">SOT</span>
+            <div style="position:relative;height:16px;border-radius:4px;background:rgba(255,255,255,0.03);overflow:hidden">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:68%;border-radius:4px;
+                background:linear-gradient(90deg, var(--teal-deep), var(--teal-bright));
+                box-shadow:0 0 8px rgba(93,202,165,0.30), inset 0 1px 0 rgba(255,255,255,0.18);
+              "></div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:12px;text-align:right;font-weight:500;color:var(--teal-bright)">68%</span>
+          </div>
+        
+          <div style="display:grid;grid-template-columns:80px 1fr 40px;align-items:center;gap:10px">
+            <span style="font-size: 12px; color: var(--t-sec); font-weight: 500">Shots</span>
+            <div style="position:relative;height:16px;border-radius:4px;background:rgba(255,255,255,0.03);overflow:hidden">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:48%;border-radius:4px;
+                background:linear-gradient(90deg, var(--amber-deep), var(--amber-bright));
+                box-shadow:0 0 8px rgba(232,181,58,0.25), inset 0 1px 0 rgba(255,255,255,0.18);
+              "></div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:12px;text-align:right;font-weight:500;color:var(--amber-bright)">48%</span>
+          </div>
+        
+          <div style="display:grid;grid-template-columns:80px 1fr 40px;align-items:center;gap:10px">
+            <span style="font-size: 12px; color: var(--t-sec); font-weight: 500">Cards</span>
+            <div style="position:relative;height:16px;border-radius:4px;background:rgba(255,255,255,0.03);overflow:hidden">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:38%;border-radius:4px;
+                background:linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.10));
+                box-shadow:none, inset 0 1px 0 rgba(255,255,255,0.18);
+              "></div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:12px;text-align:right;font-weight:500;color:var(--t-mut)">38%</span>
+          </div>
+        
+      </div>
+    </div>
+</div>
+</body></html>

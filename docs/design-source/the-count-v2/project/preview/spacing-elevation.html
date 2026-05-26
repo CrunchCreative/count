@@ -1,0 +1,50 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../styles.css"/>
+<style>
+  html, body { margin:0; background:#08090B; height:100%; }
+  .preview-card {
+    position: relative;
+    width: 100%;
+    min-height: 200px;
+    padding: 20px 22px;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    color: var(--t-pri);
+    overflow: hidden;
+  }
+  .preview-card .bg-gradients {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,181,58,0.08) 0%, transparent 60%),
+      radial-gradient(circle 60% at 90% 100%, rgba(29,110,86,0.06) 0%, transparent 65%);
+  }
+  .preview-card > .content { position: relative; z-index: 1; }
+  
+</style>
+</head><body>
+<div class="preview-card">
+  <div class="bg-gradients"></div>
+  <div class="content">
+      <div class="tc-cap" style="margin-bottom: 12px; color: var(--t-mut)">Three glass surface recipes · inset shadows + rim glows</div>
+      <div style="display:grid;grid-template-columns:repeat(3, 1fr); gap: 12px">
+        <div class="glass" style="padding: 16px; height: 110px">
+          <div class="tc-micro" style="font-size: 9px">STANDARD</div>
+          <div class="tc-cap" style="margin-top: 6px; font-size: 10px; line-height: 1.5; color: var(--t-mut)">Inset highlights only. Default panel.</div>
+        </div>
+        <div class="glass elev" style="padding: 16px; height: 110px">
+          <div class="tc-micro" style="font-size: 9px">ELEVATED</div>
+          <div class="tc-cap" style="margin-top: 6px; font-size: 10px; line-height: 1.5; color: var(--t-mut)">Amber rim glow + keyline.</div>
+        </div>
+        <div class="glass hero" style="padding: 16px; height: 110px">
+          <div class="tc-micro" style="font-size: 9px; color: var(--teal-bright)">HERO</div>
+          <div class="tc-cap" style="margin-top: 6px; font-size: 10px; line-height: 1.5; color: var(--t-mut)">Teal-rim variant on hero bg.</div>
+        </div>
+      </div>
+    </div>
+</div>
+</body></html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../styles.css"/>
+<style>
+  html, body { margin:0; background:#08090B; height:100%; }
+  .preview-card {
+    position: relative;
+    width: 100%;
+    min-height: 180px;
+    padding: 20px 22px;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    color: var(--t-pri);
+    overflow: hidden;
+  }
+  .preview-card .bg-gradients {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,181,58,0.08) 0%, transparent 60%),
+      radial-gradient(circle 60% at 90% 100%, rgba(29,110,86,0.06) 0%, transparent 65%);
+  }
+  .preview-card > .content { position: relative; z-index: 1; }
+  
+</style>
+</head><body>
+<div class="preview-card">
+  <div class="bg-gradients"></div>
+  <div class="content">
+      <div class="tc-cap" style="margin-bottom: 14px; color: var(--t-mut)">Slip bar · empty muted, populated amber-accented with most-recent leg preview</div>
+      <div style="display:flex; flex-direction: column; gap: 12px; max-width: 380px; margin: 0 auto">
+        <div class="slip-bar empty" style="position: relative; bottom: auto; left: auto; right: auto;">
+          <div class="slip-bar-left">
+            <div class="slip-bar-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t-mut)" stroke-width="1.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            </div>
+            <div class="slip-bar-info">
+              <div class="slip-bar-title">Slip</div>
+              <div class="slip-bar-preview empty">0 legs</div>
+            </div>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t-mut)" stroke-width="1.5"><polyline points="6 15 12 9 18 15"/></svg>
+        </div>
+        <div class="slip-bar populated" style="position: relative; bottom: auto; left: auto; right: auto;">
+          <div class="slip-bar-left">
+            <div class="slip-bar-icon"><span class="slip-count-badge">3</span></div>
+            <div class="slip-bar-info">
+              <div class="slip-bar-title">Slip</div>
+              <div class="slip-bar-preview"><span style="color: var(--amber-bright)">3 legs</span><span class="slip-bar-sep">·</span><span style="color: var(--t-mut)">City corners 8+</span></div>
+            </div>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amber-bright)" stroke-width="1.5"><polyline points="6 15 12 9 18 15"/></svg>
+        </div>
+      </div>
+    </div>
+</div>
+</body></html>

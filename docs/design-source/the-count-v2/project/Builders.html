@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Count — Builders tab (states across mobile + desktop)</title>
+
+<script>
+window.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} };
+window.addEventListener('error', (e) => {
+  if (e.message && String(e.message).indexOf('ResizeObserver') !== -1) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+  }
+}, true);
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="styles.css" />
+
+<style>
+  html, body { height: 100%; background: #0a0b0d; overflow: hidden; }
+  body { margin: 0; }
+  #root { height: 100vh; width: 100vw; }
+
+  .canvas-bezel {
+    width: 402px; height: 874px;
+    border-radius: 48px;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg-page);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  .canvas-bezel .di {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 122px; height: 35px; border-radius: 22px;
+    background: #000; z-index: 100;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
+  }
+  .canvas-bezel .sb {
+    position: absolute; top: 0; left: 0; right: 0; height: 54px; z-index: 80;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 30px 0;
+    font-family: -apple-system, "SF Pro", system-ui;
+    color: #F2F0E8;
+    pointer-events: none;
+  }
+  .canvas-bezel .home-ind {
+    position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+    width: 139px; height: 5px; border-radius: 100px;
+    background: rgba(255,255,255,0.6);
+    z-index: 100; pointer-events: none;
+  }
+
+  .canvas-desktop {
+    position: relative;
+    background: var(--bg-page);
+    width: 100%; height: 100%;
+    overflow: hidden;
+  }
+  .canvas-desktop .tc-app { height: 100%; }
+  .canvas-desktop .bottom-nav { display: none; }
+  .canvas-desktop .slip-bar {
+    bottom: 24px; left: 50%; right: auto;
+    transform: translateX(-50%);
+    width: 480px; max-width: calc(100% - 48px);
+  }
+  .canvas-desktop .builder-action-bar {
+    bottom: 24px;
+    left: 50%; right: auto;
+    transform: translateX(-50%);
+    width: 580px; max-width: calc(100% - 48px);
+  }
+
+  .desktop-topbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px;
+    background: linear-gradient(180deg, rgba(8,9,11,0.86), rgba(8,9,11,0.3) 70%, rgba(8,9,11,0));
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+  }
+  .desktop-topbar .brand { display: flex; align-items: center; gap: 10px; color: var(--t-pri); font-size: 14px; font-weight: 500; }
+  .desktop-topbar .brand .logo {
+    height: 47px; width: auto; display: block;
+    margin-left: -14px;
+    filter: drop-shadow(0 0 14px rgba(232,181,58,0.18));
+  }
+  .desktop-topbar .nav { display: flex; gap: 4px; }
+  .desktop-topbar .nav-item {
+    padding: 7px 14px; border-radius: 8px;
+    font-size: 13px; color: var(--t-mut); font-weight: 500;
+    cursor: pointer; border: none; background: transparent;
+  }
+  .desktop-topbar .nav-item.active {
+    color: var(--amber-bright);
+    text-shadow: 0 0 10px rgba(232,181,58,0.40);
+  }
+  .desktop-topbar .right { display: flex; align-items: center; gap: 12px; }
+
+  /* Desktop: narrow column for builders content */
+  .canvas-desktop .tc-content {
+    max-width: 720px;
+    margin: 0 auto;
+    padding-top: 80px !important;
+    padding-bottom: 110px !important;
+  }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="data.js"></script>
+<script src="data-builders.js"></script>
+<script type="text/babel" src="components/atoms.jsx"></script>
+<script type="text/babel" src="components/kit.jsx"></script>
+<script type="text/babel" src="components/tug-of-war.jsx"></script>
+<script type="text/babel" src="components/charts.jsx"></script>
+<script type="text/babel" src="components/slip.jsx"></script>
+<script type="text/babel" src="screens/builders.jsx"></script>
+<script type="text/babel" src="browser-window.jsx"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+
+<script type="text/babel">
+function StatusBar() {
+  return (
+    <span style={{display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center'}}>
+      <span style={{ fontSize: 16, fontWeight: 600, letterSpacing: -0.3 }}>9:41</span>
+      <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="#F2F0E8">
+          <rect x="0" y="6.5" width="2.5" height="4" rx="0.5" />
+          <rect x="4" y="4" width="2.5" height="6.5" rx="0.5" />
+          <rect x="8" y="2" width="2.5" height="8.5" rx="0.5" />
+          <rect x="12" y="0" width="2.5" height="10.5" rx="0.5" />
+        </svg>
+        <svg width="24" height="11" viewBox="0 0 24 11">
+          <rect x="0.5" y="0.5" width="20" height="10" rx="3" fill="none" stroke="#F2F0E8" strokeOpacity="0.5"/>
+          <rect x="2" y="2" width="17" height="7" rx="1.5" fill="#F2F0E8"/>
+          <path d="M22 4v3c0.6-0.3 1-0.8 1-1.5C23 4.8 22.6 4.3 22 4z" fill="#F2F0E8" fillOpacity="0.5"/>
+        </svg>
+      </span>
+    </span>
+  );
+}
+
+function MobileBezel({ children }) {
+  return (
+    <div className="canvas-bezel">
+      <div className="di" />
+      <div className="sb"><StatusBar /></div>
+      <div className="bg-gradients" />
+      {children}
+      <div className="bottom-nav" style={{ zIndex: 90 }}>
+        {[
+          { id: 'home',     label: 'Home',     icon: 'home' },
+          { id: 'fixtures', label: 'Fixtures', icon: 'calendar' },
+          { id: 'search',   label: 'Search',   icon: 'search' },
+          { id: 'builders', label: 'Builders', icon: 'builders', active: true },
+          { id: 'profile',  label: 'Profile',  icon: 'profile' },
+        ].map(i => (
+          <div key={i.id} className={`item ${i.active ? 'active' : ''}`}>
+            <span className="ic"><Icon name={i.icon} size={20} /></span>
+            <span>{i.label}</span>
+          </div>
+        ))}
+      </div>
+      <div className="home-ind" />
+    </div>
+  );
+}
+
+function DesktopWindow({ children, tab = 'Builders', url = 'thecount.app/builders' }) {
+  return (
+    <ChromeWindow
+      width={1100} height={900}
+      url={url}
+      tabs={[{ title: `The Count — ${tab}` }]}
+      activeIndex={0}
+    >
+      <div className="canvas-desktop">
+        <div className="bg-gradients" />
+        <div className="desktop-topbar">
+          <div className="brand">
+            <img className="logo" src="assets/count-logo.png" alt="The Count" />
+          </div>
+          <div className="nav">
+            <button className="nav-item">Home</button>
+            <button className="nav-item">Fixtures</button>
+            <button className={`nav-item ${tab === 'Builders' ? 'active' : ''}`}>Builders</button>
+            <button className="nav-item">Search</button>
+          </div>
+          <div className="right">
+            <button className="icon-btn"><Icon name="bell" size={15} /></button>
+            <div style={{
+              width: 30, height: 30, borderRadius: '50%',
+              background: 'linear-gradient(135deg, var(--amber-mid), var(--teal-deep))',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 12, fontWeight: 500, color: '#F2F0E8',
+              border: '0.5px solid var(--b-str)',
+            }}>B</div>
+          </div>
+        </div>
+        {children}
+      </div>
+    </ChromeWindow>
+  );
+}
+
+// ─────────────────────────────────────────────────────
+// State variants — control builder seed + which view shows
+// ─────────────────────────────────────────────────────
+
+function BuildersWithSeed({ seed = window.SEED_BUILDERS, initialView = 'list' }) {
+  // initialView: 'list' | 'performance' | 'detail:<id>'
+  return (
+    <SlipProvider initialBuilders={seed}>
+      <BuildersScopeBootstrap initialView={initialView} />
+    </SlipProvider>
+  );
+}
+
+function BuildersScopeBootstrap({ initialView }) {
+  // BuildersTab handles its own internal nav (performance, detail).
+  // We need to force its initial inner state via a small hack: read window query.
+  // Easiest path: render BuildersTab and use a key to also pass an override.
+  // For canvas purposes we render specific sub-page directly instead.
+  if (initialView === 'performance') {
+    return (
+      <div className="tc-app" style={{ height: '100%' }}>
+        <PerformancePageProxy />
+      </div>
+    );
+  }
+  if (typeof initialView === 'string' && initialView.startsWith('detail:')) {
+    const id = initialView.slice(7);
+    return (
+      <div className="tc-app" style={{ height: '100%' }}>
+        <BuilderDetailProxy id={id} />
+      </div>
+    );
+  }
+  return (
+    <div className="tc-app" style={{ height: '100%' }}>
+      <BuildersTab onOpenFixture={() => {}} onBack={() => {}} />
+    </div>
+  );
+}
+
+// Render PerformancePage standalone (window-level export already exists via builders.jsx)
+function PerformancePageProxy() {
+  // PerformancePage is not exported globally — re-mount via BuildersTab with auto-click.
+  // Cleaner approach: render BuildersTab and immediately click "View full performance".
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    const t = setTimeout(() => {
+      const links = ref.current?.querySelectorAll('.tap-row');
+      if (!links) return;
+      links.forEach(l => {
+        if (l.textContent && l.textContent.includes('View full performance')) l.click();
+      });
+    }, 50);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <div ref={ref} style={{ height: '100%' }}>
+      <BuildersTab onOpenFixture={() => {}} onBack={() => {}} />
+    </div>
+  );
+}
+
+function BuilderDetailProxy({ id }) {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    const t = setTimeout(() => {
+      const cards = ref.current?.querySelectorAll('.glass.tap-row');
+      if (!cards) return;
+      const slip = window.__currentSlip;
+      const idx = slip?.builders.findIndex(b => b.id === id);
+      if (idx != null && idx >= 0 && cards[idx]) cards[idx].click();
+    }, 50);
+    return () => clearTimeout(t);
+  }, [id]);
+  return (
+    <div ref={ref} style={{ height: '100%' }}>
+      <BuildersTab onOpenFixture={() => {}} onBack={() => {}} />
+      <SlipExposer />
+    </div>
+  );
+}
+function SlipExposer() {
+  const slip = useSlip();
+  window.__currentSlip = slip;
+  return null;
+}
+
+// ─── Artboards ───
+
+function MobileEmpty() {
+  return (
+    <ScopedSlipProvider seed={[]} initialView="list">
+      <MobileBezel>
+        <ScopedRender />
+        <SlipBar /><SlipSheet /><SaveBuilderModal />
+      </MobileBezel>
+    </ScopedSlipProvider>
+  );
+}
+
+function MobileOpenOnly() {
+  return (
+    <ScopedSlipProvider
+      seed={window.SEED_BUILDERS.filter(b => b.status === 'pending')}
+      initialView="list"
+    >
+      <MobileBezel>
+        <ScopedRender />
+        <SlipBar /><SlipSheet /><SaveBuilderModal />
+      </MobileBezel>
+    </ScopedSlipProvider>
+  );
+}
+
+function MobileMixed() {
+  return (
+    <ScopedSlipProvider seed={window.SEED_BUILDERS} initialView="list">
+      <MobileBezel>
+        <ScopedRender />
+        <SlipBar /><SlipSheet /><SaveBuilderModal />
+      </MobileBezel>
+    </ScopedSlipProvider>
+  );
+}
+
+function MobilePerformance() {
+  return (
+    <ScopedSlipProvider seed={window.SEED_BUILDERS} initialView="performance">
+      <MobileBezel>
+        <ScopedRender />
+        <SlipBar /><SlipSheet /><SaveBuilderModal />
+      </MobileBezel>
+    </ScopedSlipProvider>
+  );
+}
+
+function MobileDetailWon() {
+  return (
+    <ScopedSlipProvider seed={window.SEED_BUILDERS} initialView="detail:b-won-1">
+      <MobileBezel>
+        <ScopedRender />
+        <SlipBar /><SlipSheet /><SaveBuilderModal />
+      </MobileBezel>
+    </ScopedSlipProvider>
+  );
+}
+
+function DesktopEmpty() {
+  return (
+    <ScopedSlipProvider seed={[]} initialView="list">
+      <DesktopWindow>
+        <ScopedRender />
+        <SlipBar /><SlipSheet /><SaveBuilderModal />
+      </DesktopWindow>
+    </ScopedSlipProvider>
+  );
+}
+
+function DesktopOpenOnly() {
+  return (
+    <ScopedSlipProvider
+      seed={window.SEED_BUILDERS.filter(b => b.status === 'pending')}
+      initialView="list"
+    >
+      <DesktopWindow>
+        <ScopedRender />
+        <SlipBar /><SlipSheet /><SaveBuilderModal />
+      </DesktopWindow>
+    </ScopedSlipProvider>
+  );
+}
+
+function DesktopMixed() {
+  return (
+    <ScopedSlipProvider seed={window.SEED_BUILDERS} initialView="list">
+      <DesktopWindow>
+        <ScopedRender />
+        <SlipBar /><SlipSheet /><SaveBuilderModal />
+      </DesktopWindow>
+    </ScopedSlipProvider>
+  );
+}
+
+function DesktopPerformance() {
+  return (
+    <ScopedSlipProvider seed={window.SEED_BUILDERS} initialView="performance">
+      <DesktopWindow>
+        <ScopedRender />
+        <SlipBar /><SlipSheet /><SaveBuilderModal />
+      </DesktopWindow>
+    </ScopedSlipProvider>
+  );
+}
+
+// Helpers for scope plumbing
+const ScopedCtx = React.createContext({ seed: [], initialView: 'list' });
+function ScopedSlipProvider({ seed, initialView, children }) {
+  return (
+    <SlipProvider initialBuilders={seed}>
+      <ScopedCtx.Provider value={{ seed, initialView }}>
+        {children}
+      </ScopedCtx.Provider>
+    </SlipProvider>
+  );
+}
+function ScopedRender() {
+  const { initialView } = React.useContext(ScopedCtx);
+  if (initialView === 'performance') {
+    return <PerformancePageProxy />;
+  }
+  if (typeof initialView === 'string' && initialView.startsWith('detail:')) {
+    const id = initialView.slice(7);
+    return <BuilderDetailProxy id={id} />;
+  }
+  return (
+    <div className="tc-app" style={{ height: '100%' }}>
+      <BuildersTab onOpenFixture={() => {}} onBack={() => {}} />
+    </div>
+  );
+}
+
+// ─── App ───
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection
+        id="empty-state"
+        title="Empty state"
+        subtitle="No saved builders yet. Centred icon + copy + Safe @ example showing how to start."
+      >
+        <DCArtboard id="empty-mobile" label="Mobile · empty" width={402} height={874}>
+          <MobileEmpty />
+        </DCArtboard>
+        <DCArtboard id="empty-desktop" label="Desktop · empty" width={1100} height={900}>
+          <DesktopEmpty />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection
+        id="open-only"
+        title="Open builders only"
+        subtitle="Performance summary card hidden (no settled). 4 pending builders defaulting to the Open filter. Status pills muted grey."
+      >
+        <DCArtboard id="open-mobile" label="Mobile · open only" width={402} height={874}>
+          <MobileOpenOnly />
+        </DCArtboard>
+        <DCArtboard id="open-desktop" label="Desktop · open only" width={1100} height={900}>
+          <DesktopOpenOnly />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection
+        id="mixed"
+        title="Mixed open + settled"
+        subtitle="Full picture: 4 pending, 9 won, 6 lost. Performance summary card shows 60% win rate + 1-win streak. Open filter active by default. Settled cards use teal Won / red Lost status pills; lost legs show strikethrough in the preview strip."
+      >
+        <DCArtboard id="mixed-mobile" label="Mobile · mixed" width={402} height={874}>
+          <MobileMixed />
+        </DCArtboard>
+        <DCArtboard id="mixed-desktop" label="Desktop · mixed" width={1100} height={900}>
+          <DesktopMixed />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection
+        id="detail"
+        title="Builder detail — settled (Won)"
+        subtitle="Drilling into a won builder. Outcome summary at top in teal; each leg shows actual result + tick. Bottom action bar: Copy as text, Share, Duplicate."
+      >
+        <DCArtboard id="detail-mobile" label="Mobile · detail (Won)" width={402} height={874}>
+          <MobileDetailWon />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection
+        id="performance"
+        title="Performance sub-page"
+        subtitle="Full analytics view — 2×2 overall stats, line chart of win rate over 6 months, horizontal bar charts (by leg type, by league), vertical bar chart (by risk tier), then plain-language What's Working / Watch Out For insight panels."
+      >
+        <DCArtboard id="perf-mobile" label="Mobile · performance" width={402} height={874}>
+          <MobilePerformance />
+        </DCArtboard>
+        <DCArtboard id="perf-desktop" label="Desktop · performance" width={1100} height={900}>
+          <DesktopPerformance />
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+
+</head>
+<body>
+<div id="root"></div>
+</body>
+</html>

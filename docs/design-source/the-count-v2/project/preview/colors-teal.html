@@ -1,0 +1,57 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../styles.css"/>
+<style>
+  html, body { margin:0; background:#08090B; height:100%; }
+  .preview-card {
+    position: relative;
+    width: 100%;
+    min-height: 160px;
+    padding: 20px 22px;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    color: var(--t-pri);
+    overflow: hidden;
+  }
+  .preview-card .bg-gradients {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,181,58,0.08) 0%, transparent 60%),
+      radial-gradient(circle 60% at 90% 100%, rgba(29,110,86,0.06) 0%, transparent 65%);
+  }
+  .preview-card > .content { position: relative; z-index: 1; }
+  
+</style>
+</head><body>
+<div class="preview-card">
+  <div class="bg-gradients"></div>
+  <div class="content">
+      <div class="tc-cap" style="margin-bottom: 10px; color: var(--t-mut)">Secondary accent · success · "bulletproof" 5/5 · positive signals</div>
+      <div style="display:grid;grid-template-columns:repeat(3, 1fr); gap: 10px">
+        
+          <div>
+            <div style="height:54px;border-radius:8px;background:#5DCAA5;box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 0 12px rgba(93,202,165,0.4); "></div>
+            <div class="tc-cap" style="margin-top:6px"><span style="color:var(--t-pri)">Bright</span></div>
+            <div class="tc-cap" style="font-family:var(--font-mono); font-size:10px">#5DCAA5</div>
+          </div>
+        
+          <div>
+            <div style="height:54px;border-radius:8px;background:#1D9E75;box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 0 0; "></div>
+            <div class="tc-cap" style="margin-top:6px"><span style="color:var(--t-pri)">Mid</span></div>
+            <div class="tc-cap" style="font-family:var(--font-mono); font-size:10px">#1D9E75</div>
+          </div>
+        
+          <div>
+            <div style="height:54px;border-radius:8px;background:#0F6E56;box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 0 0; "></div>
+            <div class="tc-cap" style="margin-top:6px"><span style="color:var(--t-pri)">Deep</span></div>
+            <div class="tc-cap" style="font-family:var(--font-mono); font-size:10px">#0F6E56</div>
+          </div>
+        
+      </div>
+    </div>
+</div>
+</body></html>

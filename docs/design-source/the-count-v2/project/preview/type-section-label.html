@@ -1,0 +1,47 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../styles.css"/>
+<style>
+  html, body { margin:0; background:#08090B; height:100%; }
+  .preview-card {
+    position: relative;
+    width: 100%;
+    min-height: 130px;
+    padding: 20px 22px;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    color: var(--t-pri);
+    overflow: hidden;
+  }
+  .preview-card .bg-gradients {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,181,58,0.08) 0%, transparent 60%),
+      radial-gradient(circle 60% at 90% 100%, rgba(29,110,86,0.06) 0%, transparent 65%);
+  }
+  .preview-card > .content { position: relative; z-index: 1; }
+  
+</style>
+</head><body>
+<div class="preview-card">
+  <div class="bg-gradients"></div>
+  <div class="content">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="tc-section-label engine">STRONGEST ANGLES</span>
+          <span style="flex:1;height:0.5px;background:linear-gradient(90deg,rgba(255,255,255,0.10),transparent)"></span>
+          <span class="tc-cap" style="font-family:var(--font-mono);font-size:10px">Engine</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="tc-section-label utility">PICK UP WHERE YOU LEFT OFF</span>
+          <span style="flex:1;height:0.5px;background:linear-gradient(90deg,rgba(255,255,255,0.10),transparent)"></span>
+          <span class="tc-cap" style="font-family:var(--font-mono);font-size:10px">Utility</span>
+        </div>
+      </div>
+    </div>
+</div>
+</body></html>

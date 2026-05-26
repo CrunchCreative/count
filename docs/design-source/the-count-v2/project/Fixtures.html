@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Count — Fixtures list (mobile + desktop)</title>
+
+<script>
+window.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} };
+window.addEventListener('error', (e) => {
+  if (e.message && String(e.message).indexOf('ResizeObserver') !== -1) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+  }
+}, true);
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="styles.css" />
+
+<style>
+  html, body {
+    height: 100%;
+    background: #0a0b0d;
+    overflow: hidden;
+  }
+  body { margin: 0; }
+  #root { height: 100vh; width: 100vw; }
+
+  /* Bezel inside canvas */
+  .canvas-bezel {
+    width: 402px; height: 874px;
+    border-radius: 48px;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg-page);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  .canvas-bezel .di {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 122px; height: 35px; border-radius: 22px;
+    background: #000; z-index: 100;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
+  }
+  .canvas-bezel .sb {
+    position: absolute; top: 0; left: 0; right: 0; height: 54px; z-index: 80;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 30px 0;
+    font-family: -apple-system, "SF Pro", system-ui;
+    color: #F2F0E8;
+    pointer-events: none;
+  }
+  .canvas-bezel .home-ind {
+    position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+    width: 139px; height: 5px; border-radius: 100px;
+    background: rgba(255,255,255,0.6);
+    z-index: 100; pointer-events: none;
+  }
+
+  /* Desktop wrapper inside canvas */
+  .canvas-desktop {
+    position: relative;
+    background: var(--bg-page);
+    width: 100%; height: 100%;
+    overflow: hidden;
+  }
+  .canvas-desktop .tc-app {
+    height: 100%;
+  }
+  .canvas-desktop .bottom-nav {
+    display: none;
+  }
+  /* Desktop top bar (replaces mobile status bar) */
+  .desktop-topbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    background: linear-gradient(180deg, rgba(8,9,11,0.86), rgba(8,9,11,0.3) 70%, rgba(8,9,11,0));
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+  }
+  .desktop-topbar .brand {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--t-pri);
+    font-size: 14px; font-weight: 500;
+  }
+  .desktop-topbar .brand .logo {
+    height: 47px; width: auto; display: block;
+    margin-left: -14px;
+    filter: drop-shadow(0 0 14px rgba(232,181,58,0.18));
+  }
+  .desktop-topbar .nav {
+    display: flex; gap: 4px;
+  }
+  .desktop-topbar .nav-item {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--t-mut);
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    transition: all 0.15s;
+  }
+  .desktop-topbar .nav-item:hover { color: var(--t-sec); background: rgba(255,255,255,0.03); }
+  .desktop-topbar .nav-item.active {
+    color: var(--amber-bright);
+    text-shadow: 0 0 10px rgba(232,181,58,0.40);
+  }
+  .desktop-topbar .right {
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  /* Wide-mode adjustments */
+  .canvas-desktop .tc-content.wide {
+    padding-top: 90px;
+  }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="data.js"></script>
+<script type="text/babel" src="components/atoms.jsx"></script>
+<script type="text/babel" src="components/kit.jsx"></script>
+<script type="text/babel" src="components/tug-of-war.jsx"></script>
+<script type="text/babel" src="screens/fixtures-list.jsx"></script>
+<script type="text/babel" src="browser-window.jsx"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+
+<script type="text/babel">
+function StatusBar() {
+  return (
+    <span style={{display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center'}}>
+      <span style={{ fontSize: 16, fontWeight: 600, letterSpacing: -0.3 }}>9:41</span>
+      <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="#F2F0E8">
+          <rect x="0" y="6.5" width="2.5" height="4" rx="0.5" />
+          <rect x="4" y="4" width="2.5" height="6.5" rx="0.5" />
+          <rect x="8" y="2" width="2.5" height="8.5" rx="0.5" />
+          <rect x="12" y="0" width="2.5" height="10.5" rx="0.5" />
+        </svg>
+        <svg width="24" height="11" viewBox="0 0 24 11">
+          <rect x="0.5" y="0.5" width="20" height="10" rx="3" fill="none" stroke="#F2F0E8" strokeOpacity="0.5"/>
+          <rect x="2" y="2" width="17" height="7" rx="1.5" fill="#F2F0E8"/>
+          <path d="M22 4v3c0.6-0.3 1-0.8 1-1.5C23 4.8 22.6 4.3 22 4z" fill="#F2F0E8" fillOpacity="0.5"/>
+        </svg>
+      </span>
+    </span>
+  );
+}
+
+function MobileFrame() {
+  // Mobile bezel rendering FixturesList
+  return (
+    <div className="canvas-bezel">
+      <div className="di" />
+      <div className="sb"><StatusBar /></div>
+      <div className="bg-gradients" />
+      <div className="tc-app" style={{ height: '100%' }}>
+        <FixturesList onOpenFixture={() => {}} />
+      </div>
+      <div className="bottom-nav" style={{ zIndex: 90 }}>
+        {[
+          { id: 'home', label: 'Home', icon: 'home' },
+          { id: 'fixtures', label: 'Fixtures', icon: 'calendar', active: true },
+          { id: 'search', label: 'Search', icon: 'search' },
+          { id: 'builders', label: 'Builders', icon: 'builders' },
+          { id: 'profile', label: 'Profile', icon: 'profile' },
+        ].map(i => (
+          <div key={i.id} className={`item ${i.active ? 'active' : ''}`}>
+            <span className="ic"><Icon name={i.icon} size={20} /></span>
+            <span>{i.label}</span>
+          </div>
+        ))}
+      </div>
+      <div className="home-ind" />
+    </div>
+  );
+}
+
+function DesktopFrame() {
+  // Desktop chrome window with FixturesList wide
+  return (
+    <ChromeWindow
+      width={1280}
+      height={900}
+      url="thecount.app/fixtures"
+      tabs={[{ title: 'The Count — Fixtures' }]}
+      activeIndex={0}
+    >
+      <div className="canvas-desktop">
+        <div className="bg-gradients" />
+        <div className="desktop-topbar">
+          <div className="brand">
+            <img className="logo" src="assets/count-logo.png" alt="The Count" />
+          </div>
+          <div className="nav">
+            <button className="nav-item">Home</button>
+            <button className="nav-item active">Fixtures</button>
+            <button className="nav-item">Builders</button>
+            <button className="nav-item">Search</button>
+          </div>
+          <div className="right">
+            <button className="icon-btn"><Icon name="bell" size={15} /></button>
+            <div style={{
+              width: 30, height: 30, borderRadius: '50%',
+              background: 'linear-gradient(135deg, var(--amber-mid), var(--teal-deep))',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 12, fontWeight: 500, color: '#F2F0E8',
+              border: '0.5px solid var(--b-str)',
+            }}>B</div>
+          </div>
+        </div>
+        <div className="tc-app">
+          <FixturesList onOpenFixture={() => {}} wide={true} />
+        </div>
+      </div>
+    </ChromeWindow>
+  );
+}
+
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection id="fixtures" title="Fixtures list" subtitle="The browse-all-fixtures landing page — mobile native + desktop web layouts of the same screen.">
+        <DCArtboard id="mobile" label="iPhone · 402 × 874" width={402} height={874}>
+          <MobileFrame />
+        </DCArtboard>
+        <DCArtboard id="desktop" label="Desktop web · 1280 × 900" width={1280} height={900}>
+          <DesktopFrame />
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+
+</head>
+<body>
+<div id="root"></div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../styles.css"/>
+<style>
+  html, body { margin:0; background:#08090B; height:100%; }
+  .preview-card {
+    position: relative;
+    width: 100%;
+    min-height: 180px;
+    padding: 20px 22px;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    color: var(--t-pri);
+    overflow: hidden;
+  }
+  .preview-card .bg-gradients {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,181,58,0.08) 0%, transparent 60%),
+      radial-gradient(circle 60% at 90% 100%, rgba(29,110,86,0.06) 0%, transparent 65%);
+  }
+  .preview-card > .content { position: relative; z-index: 1; }
+  
+</style>
+</head><body>
+<div class="preview-card">
+  <div class="bg-gradients"></div>
+  <div class="content">
+      <div class="tc-micro" style="margin-bottom: 10px">META LINE · MONO · 10PX · 0.4 LETTER-SPACING</div>
+      <div style="font-family: var(--font-mono); font-size: 27px; color: var(--amber-bright); text-shadow: 0 0 16px rgba(232,181,58,0.4); letter-spacing: 0.5px">17:30</div>
+      <div style="font-family: var(--font-mono); font-size: 13px; color: var(--t-mut); margin-top: 10px">
+        Kickoff &middot; venue &middot; ref &middot; <span style="color: var(--teal-bright)">+12.2pp</span> edge
+      </div>
+    </div>
+</div>
+</body></html>

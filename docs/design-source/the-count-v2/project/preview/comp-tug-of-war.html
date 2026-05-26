@@ -1,0 +1,108 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../styles.css"/>
+<style>
+  html, body { margin:0; background:#08090B; height:100%; }
+  .preview-card {
+    position: relative;
+    width: 100%;
+    min-height: 220px;
+    padding: 20px 22px;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    color: var(--t-pri);
+    overflow: hidden;
+  }
+  .preview-card .bg-gradients {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,181,58,0.08) 0%, transparent 60%),
+      radial-gradient(circle 60% at 90% 100%, rgba(29,110,86,0.06) 0%, transparent 65%);
+  }
+  .preview-card > .content { position: relative; z-index: 1; }
+  
+</style>
+</head><body>
+<div class="preview-card">
+  <div class="bg-gradients"></div>
+  <div class="content">
+      <div class="tc-cap" style="margin-bottom: 14px; color: var(--t-mut)">Signature visualisation · 11-col grid · 5 stats fixed-order · teal L10+ · amber L5+</div>
+      <div class="glass" style="padding: 12px 14px; background: rgba(0,0,0,0.20)">
+        <div class="tow" style="padding: 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div class="tc-micro" style="color: var(--t-hint)">CONSISTENT THRESHOLDS</div>
+            <div style="display:flex;gap:10px">
+              <span class="legend-dot"><span class="d teal"></span> L10+</span>
+              <span class="legend-dot"><span class="d amber"></span> L5+</span>
+            </div>
+          </div>
+          
+              <div class="tow-row">
+                <div class="tow-bar-wrap left">
+                  <div class="tow-bar-track"></div>
+                  <div class="tow-bar left teal" style="width:90%"><span class="v">8+</span></div>
+                </div>
+                <div class="tow-label">CORNERS</div>
+                <div class="tow-bar-wrap right">
+                  <div class="tow-bar-track"></div>
+                  <div class="tow-bar right amber" style="width:60%"><span class="v">3+</span></div>
+                </div>
+              </div>
+            
+              <div class="tow-row">
+                <div class="tow-bar-wrap left">
+                  <div class="tow-bar-track"></div>
+                  <div class="tow-bar left teal" style="width:90%"><span class="v">↓3</span></div>
+                </div>
+                <div class="tow-label">CARDS</div>
+                <div class="tow-bar-wrap right">
+                  <div class="tow-bar-track"></div>
+                  <div class="tow-bar right amber" style="width:60%"><span class="v">1+</span></div>
+                </div>
+              </div>
+            
+              <div class="tow-row">
+                <div class="tow-bar-wrap left">
+                  <div class="tow-bar-track"></div>
+                  <div class="tow-bar left amber" style="width:60%"><span class="v">18+</span></div>
+                </div>
+                <div class="tow-label">SHOTS</div>
+                <div class="tow-bar-wrap right">
+                  <div class="tow-bar-track"></div>
+                  
+                </div>
+              </div>
+            
+              <div class="tow-row">
+                <div class="tow-bar-wrap left">
+                  <div class="tow-bar-track"></div>
+                  
+                </div>
+                <div class="tow-label">SOT</div>
+                <div class="tow-bar-wrap right">
+                  <div class="tow-bar-track"></div>
+                  <div class="tow-bar right amber" style="width:60%"><span class="v">1+</span></div>
+                </div>
+              </div>
+            
+              <div class="tow-row">
+                <div class="tow-bar-wrap left">
+                  <div class="tow-bar-track"></div>
+                  
+                </div>
+                <div class="tow-label">TACKLES</div>
+                <div class="tow-bar-wrap right">
+                  <div class="tow-bar-track"></div>
+                  
+                </div>
+              </div>
+            
+        </div>
+      </div>
+    </div>
+</div>
+</body></html>

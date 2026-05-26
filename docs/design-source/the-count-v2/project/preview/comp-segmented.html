@@ -1,0 +1,51 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../styles.css"/>
+<style>
+  html, body { margin:0; background:#08090B; height:100%; }
+  .preview-card {
+    position: relative;
+    width: 100%;
+    min-height: 180px;
+    padding: 20px 22px;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    color: var(--t-pri);
+    overflow: hidden;
+  }
+  .preview-card .bg-gradients {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,181,58,0.08) 0%, transparent 60%),
+      radial-gradient(circle 60% at 90% 100%, rgba(29,110,86,0.06) 0%, transparent 65%);
+  }
+  .preview-card > .content { position: relative; z-index: 1; }
+  
+</style>
+</head><body>
+<div class="preview-card">
+  <div class="bg-gradients"></div>
+  <div class="content">
+      <div class="tc-cap" style="margin-bottom: 12px; color: var(--t-mut)">Segmented control · teal-active (date strip) or amber-active (leg count)</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="date-strip">
+          <button class="date-seg active">Today</button>
+          <button class="date-seg">Tomorrow</button>
+          <button class="date-seg">Sat 14</button>
+          <button class="date-seg">Sun 15</button>
+        </div>
+        <div class="seg-control" style="grid-template-columns: repeat(5, 1fr); max-width: 320px">
+          <button class="seg-btn">2</button>
+          <button class="seg-btn active amber">3</button>
+          <button class="seg-btn">4</button>
+          <button class="seg-btn">5</button>
+          <button class="seg-btn">6</button>
+        </div>
+      </div>
+    </div>
+</div>
+</body></html>

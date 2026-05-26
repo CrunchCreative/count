@@ -1,0 +1,69 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../styles.css"/>
+<style>
+  html, body { margin:0; background:#08090B; height:100%; }
+  .preview-card {
+    position: relative;
+    width: 100%;
+    min-height: 160px;
+    padding: 20px 22px;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    color: var(--t-pri);
+    overflow: hidden;
+  }
+  .preview-card .bg-gradients {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,181,58,0.08) 0%, transparent 60%),
+      radial-gradient(circle 60% at 90% 100%, rgba(29,110,86,0.06) 0%, transparent 65%);
+  }
+  .preview-card > .content { position: relative; z-index: 1; }
+  
+</style>
+</head><body>
+<div class="preview-card">
+  <div class="bg-gradients"></div>
+  <div class="content">
+      <div class="tc-cap" style="margin-bottom: 12px; color: var(--t-mut)">Corner radii · from large panels to full pills</div>
+      <div style="display:flex;align-items:center;gap:14px">
+        
+          <div style="text-align: center">
+            <div style="width:60px;height:60px;background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)); border:0.5px solid var(--b-def); border-radius: 14px;"></div>
+            <div class="tc-cap" style="margin-top:8px"><span style="color:var(--t-pri)">Panel</span></div>
+            <div class="tc-cap" style="font-family:var(--font-mono); font-size:10px">14px</div>
+          </div>
+        
+          <div style="text-align: center">
+            <div style="width:60px;height:60px;background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)); border:0.5px solid var(--b-def); border-radius: 12px;"></div>
+            <div class="tc-cap" style="margin-top:8px"><span style="color:var(--t-pri)">Card</span></div>
+            <div class="tc-cap" style="font-family:var(--font-mono); font-size:10px">12px</div>
+          </div>
+        
+          <div style="text-align: center">
+            <div style="width:60px;height:60px;background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)); border:0.5px solid var(--b-def); border-radius: 10px;"></div>
+            <div class="tc-cap" style="margin-top:8px"><span style="color:var(--t-pri)">Inset</span></div>
+            <div class="tc-cap" style="font-family:var(--font-mono); font-size:10px">10px</div>
+          </div>
+        
+          <div style="text-align: center">
+            <div style="width:60px;height:60px;background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)); border:0.5px solid var(--b-def); border-radius: 7px;"></div>
+            <div class="tc-cap" style="margin-top:8px"><span style="color:var(--t-pri)">Pill</span></div>
+            <div class="tc-cap" style="font-family:var(--font-mono); font-size:10px">7px</div>
+          </div>
+        
+          <div style="text-align: center">
+            <div style="width:60px;height:60px;background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)); border:0.5px solid var(--b-def); border-radius: 999px;"></div>
+            <div class="tc-cap" style="margin-top:8px"><span style="color:var(--t-pri)">Full</span></div>
+            <div class="tc-cap" style="font-family:var(--font-mono); font-size:10px">999px</div>
+          </div>
+        
+      </div>
+    </div>
+</div>
+</body></html>
