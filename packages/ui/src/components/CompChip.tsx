@@ -1,9 +1,19 @@
-// CompChip — fixed-width "All comps" reset pill at the head of the
-// Fixtures-list filter row. Ports `.comp-chip` from the source — it's always
-// rendered in the amber treatment family (it's the "reset to All" affordance).
+// CompChip — pill-shaped chip at the head of the comp filter row. Ports
+// `.comp-chip` (styles.css line 932). Used for the "All comps" reset
+// affordance; rendered active when no league filter is set.
+//
+// Sized to match the GlassSelect trigger height beside it (matching vertical
+// padding so the two sit on the same baseline).
+//
+// Active state (`.comp-chip.active`, line 951): amber-tinted gradient
+// background + amber border + amber label + an outer amber glow (iOS shadow).
+// The CSS source layers an `inset` highlight + a `0 0 0 0.5px` halo +
+// `0 0 10px` outer glow; in RN we approximate with shadowColor / shadowRadius.
+//
+// Style passed as a single static merged object (gotcha #10).
 
 import type { ReactElement } from 'react';
-import { Pressable, StyleSheet, Text, type ViewStyle } from 'react-native';
+import { Platform, Pressable, Text, type ViewStyle } from 'react-native';
 import { colors, typography } from '@count/tokens';
 
 export interface CompChipProps {
@@ -19,16 +29,9 @@ export function CompChip({ label, active, onPress }: CompChipProps): ReactElemen
       accessibilityRole="button"
       accessibilityState={{ selected: !!active }}
       accessibilityLabel={label}
-      style={({ pressed }) => [
-        baseStyle,
-        active ? activeStyle : inactiveStyle,
-        pressed && pressedStyle,
-      ]}
+      style={active ? mergedActiveStyle : mergedInactiveStyle}
     >
-      <Text
-        style={[labelStyle, active ? labelActiveStyle : labelInactiveStyle]}
-        numberOfLines={1}
-      >
+      <Text style={active ? labelActiveStyle : labelInactiveStyle} numberOfLines={1}>
         {label}
       </Text>
     </Pressable>
@@ -37,33 +40,54 @@ export function CompChip({ label, active, onPress }: CompChipProps): ReactElemen
 
 const baseStyle: ViewStyle = {
   paddingHorizontal: 14,
+  // Match GlassSelect trigger vertical sizing (paddingVertical: 9 + 1pt border).
+  // The text size is the same, so equal padding → equal height baseline.
   paddingVertical: 9,
-  borderRadius: 7,
-  borderWidth: StyleSheet.hairlineWidth,
+  borderRadius: 999,
+  borderWidth: 1,
+  alignSelf: 'flex-start',
+  alignItems: 'center',
+  justifyContent: 'center',
 };
 
-const activeStyle: ViewStyle = {
-  borderColor: 'rgba(232,181,58,0.35)',
-  backgroundColor: 'rgba(232,181,58,0.10)',
+// iOS-only outer amber glow when active. Approximates the CSS
+// `box-shadow: 0 0 10px rgba(232,181,58,0.10)` plus the 0.5px halo.
+const activeGlow: ViewStyle =
+  Platform.select<ViewStyle>({
+    ios: {
+      shadowColor: 'rgba(232,181,58,1)',
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.35,
+      shadowRadius: 10,
+    },
+    default: {},
+  }) ?? {};
+
+const mergedInactiveStyle: ViewStyle = {
+  ...baseStyle,
+  backgroundColor: 'rgba(255,255,255,0.025)',
+  borderColor: 'rgba(255,255,255,0.14)',
 };
 
-const inactiveStyle: ViewStyle = {
-  borderColor: colors.border.strong,
-  backgroundColor: 'rgba(255,255,255,0.04)',
+const mergedActiveStyle: ViewStyle = {
+  ...baseStyle,
+  backgroundColor: 'rgba(232,181,58,0.12)',
+  borderColor: 'rgba(232,181,58,0.40)',
+  ...activeGlow,
 };
 
-const pressedStyle: ViewStyle = { opacity: 0.7 };
-
-const labelStyle = {
+const labelBaseStyle = {
   fontFamily: typography.fontSans,
   fontSize: 12,
   fontWeight: typography.weight.medium,
 };
 
-const labelActiveStyle = {
-  color: colors.amber.bright,
+const labelInactiveStyle = {
+  ...labelBaseStyle,
+  color: colors.text.muted,
 };
 
-const labelInactiveStyle = {
-  color: colors.text.muted,
+const labelActiveStyle = {
+  ...labelBaseStyle,
+  color: colors.amber.bright,
 };

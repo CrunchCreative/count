@@ -9,10 +9,10 @@
 // Page horizontal padding: 12. Panels use their own 16-20px internal padding
 // for content breathing room.
 
-import type { ReactElement } from 'react';
-import { Animated, Text, View } from 'react-native';
+import { useCallback, useRef, type ReactElement } from 'react';
+import { Animated, type ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import {
   APP_HEADER_CONTENT_HEIGHT,
   FeaturedMatch,
@@ -24,6 +24,7 @@ import {
   ResearchCard,
   ScanCard,
   SectionHead,
+  useResetScroll,
   useScrollY,
 } from '@count/ui';
 import { colors, typography } from '@count/tokens';
@@ -39,11 +40,24 @@ const PAGE_X = 12;
 export default function HomeScreen(): ReactElement {
   const insets = useSafeAreaInsets();
   const scrollY = useScrollY();
+  const resetScroll = useResetScroll();
+  const scrollRef = useRef<ScrollView>(null);
   const featuredHome = getTeam(FEATURED.home);
   const featuredAway = getTeam(FEATURED.away);
 
+  // Snap to top + reset the shared scroll value whenever this tab gains focus.
+  // Without this, switching from a scrolled-down Fixtures tab to Dashboard
+  // would inherit the previous offset and the AppHeader would stay opaque.
+  useFocusEffect(
+    useCallback(() => {
+      scrollRef.current?.scrollTo({ y: 0, animated: false });
+      resetScroll();
+    }, [resetScroll]),
+  );
+
   return (
     <Animated.ScrollView
+      ref={scrollRef}
       contentContainerStyle={{
         paddingHorizontal: PAGE_X,
         paddingTop: insets.top + APP_HEADER_CONTENT_HEIGHT + 16,

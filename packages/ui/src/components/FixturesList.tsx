@@ -1,16 +1,38 @@
 // FixturesList — Fixtures tab screen body. Ports `screens/fixtures-list.jsx`.
 //
 // Layout (column):
-//   1. Header row    — H1 + sub-line | filter / search icon buttons
-//   2. Date strip    — four DateChips, today active by default
+//   1. Header row    — H1 + sub-line | filter icon button
+//   2. Date strip    — single bordered container with four DateChip segments
+//                      inside (ports .date-strip from styles.css line 895).
+//                      grid-auto-columns: 1fr → segments share width equally
+//                      via flex: 1 on each child.
 //   3. Comp filter   — All-comps CompChip + GlassSelect dropdown (filters list)
 //   4. League list   — visible leagues stacked, each via FixtureLeagueSection
 //
 // Date strip is visually selectable but doesn't filter (date-aware filtering
 // is real-data territory, out of scope this phase). Comp dropdown is wired.
+//
+// Phase 3.6.1: exposes an imperative `scrollToTop()` handle via `forwardRef`
+// so the (tabs)/fixtures.tsx wrapper can snap the list back to the top on
+// tab focus.
 
-import { useMemo, useState, type ReactElement } from 'react';
-import { Animated, Text, View, type ViewStyle } from 'react-native';
+import {
+  forwardRef,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  type ForwardedRef,
+  type ReactElement,
+} from 'react';
+import {
+  Animated,
+  StyleSheet,
+  type ScrollView,
+  Text,
+  View,
+  type ViewStyle,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography } from '@count/tokens';
 import type { FixturesByLeague, Team } from '@count/types';
@@ -34,6 +56,11 @@ const DAY_OPTIONS = [
 
 const ALL_COMPS = 'all';
 
+export interface FixturesListHandle {
+  /** Snap the scrollview to the top. No animation. */
+  scrollToTop: () => void;
+}
+
 export interface FixturesListProps {
   fixturesByLeague: FixturesByLeague;
   resolveTeam: (code: string) => Team | undefined;
@@ -41,16 +68,30 @@ export interface FixturesListProps {
   onPressFilter?: () => void;
 }
 
-export function FixturesList({
-  fixturesByLeague,
-  resolveTeam,
-  onOpenFixture,
-  onPressFilter,
-}: FixturesListProps): ReactElement {
+function FixturesListInner(
+  {
+    fixturesByLeague,
+    resolveTeam,
+    onOpenFixture,
+    onPressFilter,
+  }: FixturesListProps,
+  ref: ForwardedRef<FixturesListHandle>,
+): ReactElement {
   const insets = useSafeAreaInsets();
   const scrollY = useScrollY();
+  const scrollRef = useRef<ScrollView>(null);
   const [day, setDay] = useState('today');
   const [comp, setComp] = useState<string>(ALL_COMPS);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollToTop: () => {
+        scrollRef.current?.scrollTo({ y: 0, animated: false });
+      },
+    }),
+    [],
+  );
 
   const allLeagues = useMemo(() => Object.keys(fixturesByLeague), [fixturesByLeague]);
   const total = useMemo(
@@ -75,6 +116,7 @@ export function FixturesList({
 
   return (
     <Animated.ScrollView
+      ref={scrollRef}
       contentContainerStyle={{
         paddingHorizontal: PAGE_X,
         paddingTop: insets.top + APP_HEADER_CONTENT_HEIGHT + 16,
@@ -100,7 +142,7 @@ export function FixturesList({
         </View>
       </View>
 
-      {/* Date strip */}
+      {/* Date strip — single bordered container with four equal-width segments */}
       <View style={dateStripStyle}>
         {DAY_OPTIONS.map((d) => (
           <DateChip
@@ -145,6 +187,10 @@ export function FixturesList({
   );
 }
 
+export const FixturesList = forwardRef<FixturesListHandle, FixturesListProps>(
+  FixturesListInner,
+);
+
 const headerRowStyle: ViewStyle = {
   flexDirection: 'row',
   justifyContent: 'space-between',
@@ -176,14 +222,21 @@ const subLineStyle = {
   lineHeight: 13 * 1.45,
 };
 
+// Date strip container — `.date-strip` in styles.css line 895.
+// One bordered rounded box; segments inside share width via flex: 1.
 const dateStripStyle: ViewStyle = {
   flexDirection: 'row',
-  gap: 6,
   marginTop: 24,
+  padding: 4,
+  borderRadius: 11,
+  borderWidth: 1,
+  borderColor: 'rgba(255,255,255,0.10)',
+  backgroundColor: 'rgba(255,255,255,0.015)',
 };
 
 const compRowStyle: ViewStyle = {
   flexDirection: 'row',
+  alignItems: 'center',
   gap: 8,
   marginTop: 18,
   zIndex: 30,

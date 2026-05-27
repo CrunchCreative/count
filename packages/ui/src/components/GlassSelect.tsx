@@ -1,10 +1,16 @@
 // GlassSelect — trigger + inline dropdown panel. Used by the Fixtures-list
-// comp filter row to switch the visible league.
+// comp filter row to switch the visible league. Ports `.glass-select`
+// (styles.css line 346).
 //
-// The dropdown panel renders as an absolute child of the trigger, positioned
-// just below it. z-index 30 puts it above the FixturesList content scrolling
-// below, but well below the BottomNav (90), NotePadBar (85), and NotePadSheet
-// (99/100). It's a transient menu, not a modal.
+// Layout (trigger row): optional amber dot (when filteringActive), label
+// growing to fill space, optional mono count, chevron-down.
+//
+// Dropdown panel: positioned absolute below the trigger. z-index 30
+// (transient menu — sits above scrolling content beneath, well below the
+// sheet/nav/bar at 85/90/99/100).
+//
+// Style passed as a single static merged object on the trigger (gotcha #10
+// — Pressable can drop properties from style arrays containing inline objects).
 
 import { useState, type ReactElement } from 'react';
 import {
@@ -14,8 +20,8 @@ import {
   View,
   type ViewStyle,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { colors, typography } from '@count/tokens';
+import { Platform } from 'react-native';
+import { colors, radii, typography } from '@count/tokens';
 import { Icon } from './Icon';
 
 export const GLASS_SELECT_DROPDOWN_Z_INDEX = 30;
@@ -23,7 +29,6 @@ export const GLASS_SELECT_DROPDOWN_Z_INDEX = 30;
 export interface GlassSelectOption {
   id: string;
   label: string;
-  /** Optional right-side count, mono-typed. */
   count?: number;
 }
 
@@ -31,10 +36,7 @@ export interface GlassSelectProps {
   value: string;
   options: GlassSelectOption[];
   onChange: (id: string) => void;
-  /**
-   * `filteringActive` shifts the trigger's text color to primary and shows the
-   * amber dot — mirrors the source's `filteringActive && <span className="dot" />`.
-   */
+  /** When true, render the amber leading dot. Indicates a non-default filter is active. */
   filteringActive?: boolean;
 }
 
@@ -46,8 +48,8 @@ export function GlassSelect({
 }: GlassSelectProps): ReactElement {
   const [open, setOpen] = useState(false);
   const current = options.find((o) => o.id === value);
-  const currentLabel = current?.label ?? '';
-  const currentCount = current?.count;
+  const label = current?.label ?? 'Select…';
+  const count = current?.count;
 
   return (
     <View style={wrapStyle}>
@@ -55,72 +57,43 @@ export function GlassSelect({
         onPress={() => setOpen((v) => !v)}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
-        accessibilityLabel={`Select competition. Current: ${currentLabel}`}
-        style={({ pressed }) => [triggerStyle, pressed && pressedStyle]}
+        accessibilityLabel={label}
+        style={triggerStyle}
       >
         {filteringActive ? <View style={dotStyle} /> : null}
-        <Text
-          style={[
-            triggerLabelStyle,
-            filteringActive ? triggerLabelActiveStyle : triggerLabelMutedStyle,
-          ]}
-          numberOfLines={1}
-        >
-          {currentLabel}
+        <Text style={triggerLabelStyle} numberOfLines={1}>
+          {label}
         </Text>
-        {filteringActive && typeof currentCount === 'number' ? (
-          <Text style={triggerCountStyle}>{currentCount}</Text>
+        {typeof count === 'number' ? (
+          <Text style={countStyle}>{count}</Text>
         ) : null}
-        <Icon
-          name={open ? 'chevron-up' : 'chevron-down'}
-          size={14}
-          color={colors.text.muted}
-        />
+        <Icon name="chevron-down" size={14} color={colors.text.muted} />
       </Pressable>
 
       {open ? (
-        <View style={panelStyle}>
-          <LinearGradient
-            colors={['rgba(20,21,24,0.97)', 'rgba(15,16,18,0.97)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={StyleSheet.absoluteFill}
-          />
-          {options.map((o) => {
-            const selected = o.id === value;
+        <View style={dropdownStyle}>
+          {options.map((opt) => {
+            const selected = opt.id === value;
             return (
               <Pressable
-                key={o.id}
+                key={opt.id}
                 onPress={() => {
-                  onChange(o.id);
+                  onChange(opt.id);
                   setOpen(false);
                 }}
-                accessibilityRole="menuitem"
-                accessibilityState={{ selected }}
-                accessibilityLabel={o.label}
-                style={({ pressed }) => [
-                  optionStyle,
-                  selected && optionSelectedStyle,
-                  pressed && pressedStyle,
-                ]}
+                style={selected ? optionSelectedStyle : optionStyle}
               >
                 <Text
-                  style={[
-                    optionLabelStyle,
-                    selected ? optionLabelSelectedStyle : optionLabelDefaultStyle,
-                  ]}
+                  style={selected ? optionLabelSelectedStyle : optionLabelStyle}
                   numberOfLines={1}
                 >
-                  {o.label}
+                  {opt.label}
                 </Text>
-                {typeof o.count === 'number' ? (
+                {typeof opt.count === 'number' ? (
                   <Text
-                    style={[
-                      optionCountStyle,
-                      selected ? optionCountSelectedStyle : optionCountDefaultStyle,
-                    ]}
+                    style={selected ? optionCountSelectedStyle : optionCountStyle}
                   >
-                    {o.count}
+                    {opt.count}
                   </Text>
                 ) : null}
               </Pressable>
@@ -134,98 +107,108 @@ export function GlassSelect({
 
 const wrapStyle: ViewStyle = {
   flex: 1,
-  minWidth: 0,
+  position: 'relative',
+  zIndex: GLASS_SELECT_DROPDOWN_Z_INDEX,
 };
 
 const triggerStyle: ViewStyle = {
   flexDirection: 'row',
   alignItems: 'center',
-  gap: 8,
-  paddingHorizontal: 12,
+  gap: 10,
+  paddingHorizontal: 14,
   paddingVertical: 9,
-  borderRadius: 7,
-  borderWidth: StyleSheet.hairlineWidth,
-  borderColor: colors.border.strong,
-  backgroundColor: 'rgba(255,255,255,0.04)',
+  borderRadius: 10,
+  borderWidth: 1,
+  borderColor: 'rgba(255,255,255,0.14)',
+  backgroundColor: 'rgba(255,255,255,0.025)',
 };
-
-const pressedStyle: ViewStyle = { opacity: 0.7 };
 
 const dotStyle: ViewStyle = {
   width: 6,
   height: 6,
-  borderRadius: 999,
+  borderRadius: 3,
   backgroundColor: colors.amber.bright,
 };
 
 const triggerLabelStyle = {
+  flex: 1,
+  minWidth: 0,
+  color: colors.text.primary,
   fontFamily: typography.fontSans,
   fontSize: 13,
-  fontWeight: typography.weight.medium,
-  flex: 1,
-  flexShrink: 1,
+  fontWeight: typography.weight.regular,
 };
 
-const triggerLabelActiveStyle = { color: colors.text.primary };
-const triggerLabelMutedStyle = { color: colors.text.muted };
-
-const triggerCountStyle = {
-  color: colors.amber.bright,
+const countStyle = {
+  color: colors.text.hint,
   fontFamily: typography.fontMono,
   fontSize: 10,
-  fontWeight: typography.weight.medium,
+  fontWeight: typography.weight.regular,
+  marginRight: 2,
 };
 
-const panelStyle: ViewStyle = {
+const dropdownShadow = Platform.select<ViewStyle>({
+  ios: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+  },
+  default: {
+    elevation: 8,
+  },
+}) ?? {};
+
+const dropdownStyle: ViewStyle = {
   position: 'absolute',
   top: '100%',
   left: 0,
   right: 0,
   marginTop: 6,
-  padding: 6,
-  borderRadius: 10,
-  borderWidth: StyleSheet.hairlineWidth,
-  borderColor: colors.border.strong,
-  overflow: 'hidden',
-  zIndex: GLASS_SELECT_DROPDOWN_Z_INDEX,
-  // iOS shadow — gives the panel real separation from the row beneath.
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 8 },
-  shadowOpacity: 0.4,
-  shadowRadius: 18,
-  elevation: 8,
+  paddingVertical: 4,
+  borderRadius: radii.panel,
+  borderWidth: 1,
+  borderColor: 'rgba(255,255,255,0.14)',
+  backgroundColor: 'rgba(20,21,24,0.98)',
+  ...dropdownShadow,
 };
 
 const optionStyle: ViewStyle = {
   flexDirection: 'row',
   alignItems: 'center',
-  justifyContent: 'space-between',
   gap: 10,
-  paddingHorizontal: 12,
+  paddingHorizontal: 14,
   paddingVertical: 10,
-  borderRadius: 8,
+  backgroundColor: 'transparent',
 };
 
 const optionSelectedStyle: ViewStyle = {
-  backgroundColor: 'rgba(232,181,58,0.06)',
+  ...optionStyle,
+  backgroundColor: 'rgba(232,181,58,0.10)',
 };
 
 const optionLabelStyle = {
+  flex: 1,
+  minWidth: 0,
+  color: colors.text.primary,
   fontFamily: typography.fontSans,
   fontSize: 13,
-  fontWeight: typography.weight.medium,
-  flex: 1,
+  fontWeight: typography.weight.regular,
 };
 
-const optionLabelSelectedStyle = { color: colors.amber.bright };
-const optionLabelDefaultStyle = { color: colors.text.primary };
+const optionLabelSelectedStyle = {
+  ...optionLabelStyle,
+  color: colors.amber.bright,
+  fontWeight: typography.weight.medium,
+};
 
 const optionCountStyle = {
+  color: colors.text.hint,
   fontFamily: typography.fontMono,
-  fontSize: 11,
-  fontWeight: typography.weight.regular,
-  letterSpacing: 0.3,
+  fontSize: 10,
 };
 
-const optionCountSelectedStyle = { color: colors.amber.bright };
-const optionCountDefaultStyle = { color: colors.text.hint };
+const optionCountSelectedStyle = {
+  ...optionCountStyle,
+  color: colors.amber.bright,
+};

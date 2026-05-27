@@ -1,11 +1,21 @@
-// DateChip — single day segment in the Fixtures-list date strip. Ports the
-// source's `.date-seg`. Active state uses amber border + amber-tinted fill +
-// amber-bright label; inactive uses a stronger-than-default glass border so
-// the pill is clearly bordered on a dark backdrop (otherwise the chip reads
-// as flat text on device).
+// DateChip — single segment inside the date strip. Ports `.date-seg` from
+// docs/design-source/the-count-v2/project/styles.css (line 906).
+//
+// IMPORTANT: this component is NOT a standalone pill. It's a transparent
+// segment that sits inside a bordered `.date-strip` container (rendered by
+// FixturesList). The outer container provides the visible chrome; the
+// segment changes only its background + text colour + glow when active.
+//
+// Active state (`.date-seg.active`, line 920): teal-tinted background, teal
+// label, soft teal glow. The CSS layers an `inset` highlight + a 0.5px halo +
+// `0 0 12px rgba(93,202,165,0.10)` outer glow; in RN we approximate the
+// outer glow with iOS shadowColor / shadowRadius.
+//
+// Style passed as a single static merged object (gotcha #10 — Pressable can
+// drop properties from style arrays containing inline objects).
 
 import type { ReactElement } from 'react';
-import { Pressable, StyleSheet, Text, type ViewStyle } from 'react-native';
+import { Platform, Pressable, Text, type ViewStyle } from 'react-native';
 import { colors, typography } from '@count/tokens';
 
 export interface DateChipProps {
@@ -21,16 +31,9 @@ export function DateChip({ label, active, onPress }: DateChipProps): ReactElemen
       accessibilityRole="button"
       accessibilityState={{ selected: !!active }}
       accessibilityLabel={label}
-      style={({ pressed }) => [
-        baseStyle,
-        active ? activeStyle : inactiveStyle,
-        pressed && pressedStyle,
-      ]}
+      style={active ? mergedActiveStyle : mergedInactiveStyle}
     >
-      <Text
-        style={[labelStyle, active ? labelActiveStyle : labelInactiveStyle]}
-        numberOfLines={1}
-      >
+      <Text style={active ? labelActiveStyle : labelInactiveStyle} numberOfLines={1}>
         {label}
       </Text>
     </Pressable>
@@ -38,34 +41,52 @@ export function DateChip({ label, active, onPress }: DateChipProps): ReactElemen
 }
 
 const baseStyle: ViewStyle = {
-  paddingHorizontal: 14,
-  paddingVertical: 8,
-  borderRadius: 7,
-  borderWidth: StyleSheet.hairlineWidth,
+  flex: 1, // grid-auto-columns: 1fr — equal-width segments inside .date-strip
+  paddingHorizontal: 10,
+  paddingVertical: 9,
+  borderRadius: 8,
+  alignItems: 'center',
+  justifyContent: 'center',
 };
 
-const activeStyle: ViewStyle = {
-  borderColor: 'rgba(232,181,58,0.35)',
-  backgroundColor: 'rgba(232,181,58,0.10)',
+// iOS-only outer teal glow when active. Approximates the CSS
+// `box-shadow: 0 0 12px rgba(93,202,165,0.10)`.
+const activeGlow: ViewStyle =
+  Platform.select<ViewStyle>({
+    ios: {
+      shadowColor: 'rgba(93,202,165,1)',
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.35,
+      shadowRadius: 10,
+    },
+    default: {},
+  }) ?? {};
+
+const mergedInactiveStyle: ViewStyle = {
+  ...baseStyle,
+  backgroundColor: 'transparent',
 };
 
-const inactiveStyle: ViewStyle = {
-  borderColor: colors.border.strong,
-  backgroundColor: 'rgba(255,255,255,0.04)',
+const mergedActiveStyle: ViewStyle = {
+  ...baseStyle,
+  backgroundColor: 'rgba(93,202,165,0.14)',
+  borderWidth: 1,
+  borderColor: 'rgba(93,202,165,0.40)',
+  ...activeGlow,
 };
 
-const pressedStyle: ViewStyle = { opacity: 0.7 };
-
-const labelStyle = {
+const labelBaseStyle = {
   fontFamily: typography.fontSans,
-  fontSize: 12,
+  fontSize: 12.5,
   fontWeight: typography.weight.medium,
 };
 
-const labelActiveStyle = {
-  color: colors.amber.bright,
+const labelInactiveStyle = {
+  ...labelBaseStyle,
+  color: colors.text.muted,
 };
 
-const labelInactiveStyle = {
-  color: colors.text.muted,
+const labelActiveStyle = {
+  ...labelBaseStyle,
+  color: colors.teal.bright,
 };

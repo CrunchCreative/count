@@ -41,7 +41,11 @@ export type {
 } from './context/NotePadContext';
 
 // Scroll subsystem — shared Animated.Value for header background animation
-export { ScrollProvider, useScrollY } from './context/ScrollContext';
+export {
+  ScrollProvider,
+  useScrollY,
+  useResetScroll,
+} from './context/ScrollContext';
 export type {
   ScrollContextValue,
   ScrollProviderProps,
@@ -75,7 +79,10 @@ export type {
 } from './components/GlassSelect';
 export type { FixtureListCardProps } from './components/FixtureListCard';
 export type { FixtureLeagueSectionProps } from './components/FixtureLeagueSection';
-export type { FixturesListProps } from './components/FixturesList';
+export type {
+  FixturesListProps,
+  FixturesListHandle,
+} from './components/FixturesList';
 
 // Dashboard composite components
 export { HeroCarousel } from './components/HeroCarousel';

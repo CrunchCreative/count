@@ -51,7 +51,7 @@ const BG_FADE_RANGE = 60;
 const LOGO_NATURAL_W = 3508;
 const LOGO_NATURAL_H = 1363;
 /** Phase 3.6: was 32, now 42 — +30%. */
-const LOGO_HEIGHT = 42;
+const LOGO_HEIGHT = 60;
 const LOGO_WIDTH = LOGO_HEIGHT * (LOGO_NATURAL_W / LOGO_NATURAL_H);
 
 export interface AppHeaderProps {
@@ -173,7 +173,12 @@ const rightStyle: ViewStyle = {
 const logoStyle = {
   height: LOGO_HEIGHT,
   width: LOGO_WIDTH,
-  marginLeft: -4,
+  // Phase 3.6.1: nudged from -4 to -12 so the painted leftmost pixel of the
+  // logo sits flush with screen-edge H1s (e.g. "Fixtures") sitting at the
+  // standard 16px screen padding. The PNG has built-in transparent canvas
+  // around the artwork that the nominal 16px wrap padding doesn't account
+  // for.
+  marginLeft: -18,
 };
 
 const pressedStyle: ViewStyle = { opacity: 0.8 };
