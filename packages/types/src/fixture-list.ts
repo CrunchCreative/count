@@ -24,6 +24,17 @@ export interface FixtureListItem {
     title: string;
     tier: LegTier;
   };
+  /** Match official + their card-discipline averages. Drives the referee row on
+   *  the Fixtures-list card. Full referee record (homeWinPct, cardsAboveAvg)
+   *  lives on the deeper fixture shape used by the fixture-detail screen. */
+  referee: {
+    /** Display name, e.g. 'M. Oliver'. */
+    name: string;
+    /** Yellow cards issued per match, decimal — e.g. 4.2. */
+    cardsPerMatch: number;
+    /** Red cards issued per match, decimal — e.g. 0.13. */
+    redsPerMatch: number;
+  };
 }
 
 /** Keyed by league name, e.g. 'Premier League': FixtureListItem[]. */

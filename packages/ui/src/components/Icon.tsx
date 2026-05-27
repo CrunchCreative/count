@@ -6,7 +6,8 @@ export type IconName =
   | 'chevron-left' | 'chevron-right' | 'chevron-up' | 'chevron-down'
   | 'bookmark' | 'search' | 'bell' | 'home' | 'calendar' | 'profile'
   | 'builders' | 'filter' | 'arrow-right' | 'arrow-left' | 'flag'
-  | 'sparkles' | 'target' | 'card' | 'arrows-h' | 'bars' | 'check'
+  | 'sparkles' | 'target' | 'card' | 'card-yellow' | 'card-red'
+  | 'arrows-h' | 'bars' | 'check'
   | 'info' | 'plus' | 'corner' | 'x' | 'x-circle' | 'more' | 'close'
   | 'layers' | 'copy' | 'duplicate' | 'trash' | 'check-circle' | 'share';
 
@@ -155,6 +156,37 @@ export function Icon({
       return (
         <Svg {...svgProps}>
           <Rect x="3" y="5" width="18" height="14" rx="2" {...common} />
+        </Svg>
+      );
+    case 'card-yellow':
+      // Filled yellow card — amber-bright fill, no stroke. Tilted slightly via
+      // a narrower aspect than the outlined `card` glyph; matches the source's
+      // "rounded rectangle in the team's card-colour" treatment.
+      return (
+        <Svg {...svgProps}>
+          <Rect
+            x="6"
+            y="3"
+            width="12"
+            height="18"
+            rx="2"
+            fill={color === colors.text.primary ? '#E8B53A' : color}
+            stroke="none"
+          />
+        </Svg>
+      );
+    case 'card-red':
+      return (
+        <Svg {...svgProps}>
+          <Rect
+            x="6"
+            y="3"
+            width="12"
+            height="18"
+            rx="2"
+            fill={color === colors.text.primary ? '#D63A3A' : color}
+            stroke="none"
+          />
         </Svg>
       );
     case 'arrows-h':

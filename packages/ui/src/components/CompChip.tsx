@@ -1,5 +1,6 @@
-// CompChip — fixed-width "All comps" pill at the head of the Fixtures-list
-// filter row. Ports `.comp-chip` from the source.
+// CompChip — fixed-width "All comps" reset pill at the head of the
+// Fixtures-list filter row. Ports `.comp-chip` from the source — it's always
+// rendered in the amber treatment family (it's the "reset to All" affordance).
 
 import type { ReactElement } from 'react';
 import { Pressable, StyleSheet, Text, type ViewStyle } from 'react-native';
@@ -35,20 +36,20 @@ export function CompChip({ label, active, onPress }: CompChipProps): ReactElemen
 }
 
 const baseStyle: ViewStyle = {
-  paddingHorizontal: 12,
+  paddingHorizontal: 14,
   paddingVertical: 9,
-  borderRadius: 8,
+  borderRadius: 7,
   borderWidth: StyleSheet.hairlineWidth,
 };
 
 const activeStyle: ViewStyle = {
-  borderColor: 'rgba(232,181,58,0.30)',
-  backgroundColor: 'rgba(232,181,58,0.06)',
+  borderColor: 'rgba(232,181,58,0.35)',
+  backgroundColor: 'rgba(232,181,58,0.10)',
 };
 
 const inactiveStyle: ViewStyle = {
-  borderColor: colors.border.default,
-  backgroundColor: 'rgba(255,255,255,0.02)',
+  borderColor: colors.border.strong,
+  backgroundColor: 'rgba(255,255,255,0.04)',
 };
 
 const pressedStyle: ViewStyle = { opacity: 0.7 };

@@ -111,6 +111,28 @@ export function FixtureListCard({
           </View>
         </View>
 
+        {/* Referee row — name + yellow cpm + red cpm, centred. */}
+        <View style={refereeWrapStyle}>
+          <Text style={refereeLabelStyle}>REFEREE</Text>
+          <View style={refereeRowStyle}>
+            <Text style={refereeNameStyle} numberOfLines={1}>
+              {fixture.referee.name}
+            </Text>
+            <View style={refereeStatPairStyle}>
+              <Icon name="card-yellow" size={14} />
+              <Text style={refereeStatStyle}>
+                {fixture.referee.cardsPerMatch.toFixed(1)}
+              </Text>
+            </View>
+            <View style={refereeStatPairStyle}>
+              <Icon name="card-red" size={14} />
+              <Text style={refereeStatStyle}>
+                {fixture.referee.redsPerMatch.toFixed(2)}
+              </Text>
+            </View>
+          </View>
+        </View>
+
         {/* Top angle inset row */}
         <View style={angleInsetStyle}>
           {leg ? (
@@ -233,6 +255,48 @@ const vsStyle = {
   fontWeight: typography.weight.regular,
   letterSpacing: 0.4,
   textTransform: 'uppercase' as const,
+};
+
+const refereeWrapStyle: ViewStyle = {
+  alignItems: 'center',
+  marginBottom: 12,
+};
+
+const refereeLabelStyle = {
+  color: colors.text.hint,
+  fontFamily: typography.fontMono,
+  fontSize: 9,
+  fontWeight: typography.weight.regular,
+  letterSpacing: 0.4,
+  textTransform: 'uppercase' as const,
+  marginBottom: 4,
+};
+
+const refereeRowStyle: ViewStyle = {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 12,
+};
+
+const refereeNameStyle = {
+  color: colors.text.muted,
+  fontFamily: typography.fontSans,
+  fontSize: 12,
+  fontWeight: typography.weight.regular,
+};
+
+const refereeStatPairStyle: ViewStyle = {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 4,
+};
+
+const refereeStatStyle = {
+  color: colors.text.primary,
+  fontFamily: typography.fontMono,
+  fontSize: 12,
+  fontWeight: typography.weight.regular,
 };
 
 const angleInsetStyle: ViewStyle = {

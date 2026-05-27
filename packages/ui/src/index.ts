@@ -22,6 +22,12 @@ export { HScroll } from './components/HScroll';
 // App-shell chrome
 export { BottomNav, BOTTOM_NAV_Z_INDEX } from './components/BottomNav';
 export { NotePadBar, NOTE_PAD_BAR_Z_INDEX } from './components/NotePadBar';
+export {
+  AppHeader,
+  APP_HEADER_CONTENT_HEIGHT,
+  APP_HEADER_Z_INDEX,
+} from './components/AppHeader';
+export type { AppHeaderProps } from './components/AppHeader';
 
 // Note Pad subsystem
 export {

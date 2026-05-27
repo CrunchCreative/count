@@ -2,19 +2,23 @@
 // Mounted once at the root layout as an absolute-positioned sibling. Renders
 // nothing when `isOpen === false` so its constant mounting is cheap.
 //
-// Hand-rolled (no react-native-gesture-handler dep) — interactions are open /
-// close / backdrop tap / remove leg, no drag-to-dismiss. Drag handle is
-// decorative.
+// Hand-rolled (no react-native-gesture-handler dep). Three ways to close:
+//   1. Tap the dimmed backdrop.
+//   2. Tap the drag handle (decorative pill at the sheet top — extra-large
+//      tap zone wraps it).
+//   3. Drag the sheet down past ~100px or release with a downward fling
+//      (vy > 0.5). The pan responder lives on the drag-handle zone so it
+//      never fights the legs ScrollView for vertical gesture ownership.
 //
 // z-index 100 (container) + 99 (backdrop) sit above BottomNav (90) and
-// NotePadBar (85), so when open the sheet covers everything. This is
-// intentional (modal). Closing returns the lower-stack to normal.
+// NotePadBar (85). When open the sheet covers everything. This is intended.
 
-import { useEffect, useRef, useState, type ReactElement } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import {
   Animated,
   Dimensions,
   Easing,
+  PanResponder,
   Platform,
   Pressable,
   ScrollView,
@@ -35,6 +39,12 @@ export const NOTE_PAD_SHEET_BACKDROP_Z_INDEX = 99;
 export const NOTE_PAD_SHEET_Z_INDEX = 100;
 
 const TOAST_MS = 2000;
+/** Drag-down threshold in px to dismiss; below this the sheet snaps back open. */
+const DRAG_DISMISS_DISTANCE = 100;
+/** Or release with vy >= this to dismiss via fling. */
+const DRAG_DISMISS_VELOCITY = 0.5;
+/** Tap interpreted as a press (not a drag) when total movement stays under this. */
+const TAP_SLOP = 4;
 
 export function NotePadSheet(): ReactElement | null {
   const insets = useSafeAreaInsets();
@@ -42,12 +52,13 @@ export function NotePadSheet(): ReactElement | null {
   const [toast, setToast] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Slide-up + fade animation. Cheap, native-driver. No drag.
   const screenH = Dimensions.get('window').height;
   const sheetMax = Math.round(screenH * 0.6);
   const translateY = useRef(new Animated.Value(sheetMax)).current;
   const backdropAlpha = useRef(new Animated.Value(0)).current;
 
+  // Drive the open/close animation off `isOpen`. Animations are
+  // native-driver-safe (translate + opacity).
   useEffect(() => {
     Animated.parallel([
       Animated.timing(translateY, {
@@ -64,12 +75,62 @@ export function NotePadSheet(): ReactElement | null {
     ]).start();
   }, [isOpen, sheetMax, translateY, backdropAlpha]);
 
-  // Clean up any in-flight toast on unmount.
   useEffect(() => {
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     };
   }, []);
+
+  // PanResponder for the drag-handle zone. Tap = close. Drag down past
+  // threshold OR fling down = close. Drag down under threshold = snap back.
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: (_e, g) =>
+          Math.abs(g.dy) > Math.abs(g.dx) && g.dy > 2,
+        onPanResponderMove: (_e, g) => {
+          if (g.dy > 0) translateY.setValue(g.dy);
+        },
+        onPanResponderRelease: (_e, g) => {
+          const movement = Math.hypot(g.dx, g.dy);
+          // Treat as a tap if barely moved.
+          if (movement < TAP_SLOP) {
+            close();
+            return;
+          }
+          const shouldClose =
+            g.dy > DRAG_DISMISS_DISTANCE || g.vy > DRAG_DISMISS_VELOCITY;
+          if (shouldClose) {
+            // Animate the remaining distance and notify provider.
+            Animated.timing(translateY, {
+              toValue: sheetMax,
+              duration: 200,
+              easing: Easing.bezier(0.22, 1, 0.36, 1),
+              useNativeDriver: true,
+            }).start(({ finished }) => {
+              if (finished) close();
+            });
+          } else {
+            // Snap back open.
+            Animated.timing(translateY, {
+              toValue: 0,
+              duration: 200,
+              easing: Easing.bezier(0.22, 1, 0.36, 1),
+              useNativeDriver: true,
+            }).start();
+          }
+        },
+        onPanResponderTerminate: () => {
+          Animated.timing(translateY, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }).start();
+        },
+      }),
+    [translateY, sheetMax, close],
+  );
 
   const showToast = (msg: string) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -77,7 +138,6 @@ export function NotePadSheet(): ReactElement | null {
     toastTimerRef.current = setTimeout(() => setToast(null), TOAST_MS);
   };
 
-  // Skip the heavy subtree entirely when closed.
   if (!isOpen) return null;
 
   const count = legs.length;
@@ -104,7 +164,11 @@ export function NotePadSheet(): ReactElement | null {
           { maxHeight: sheetMax, transform: [{ translateY }] },
         ]}
       >
-        <BlurView intensity={Platform.OS === 'ios' ? 60 : 0} tint="dark" style={StyleSheet.absoluteFill} />
+        <BlurView
+          intensity={Platform.OS === 'ios' ? 60 : 0}
+          tint="dark"
+          style={StyleSheet.absoluteFill}
+        />
         <LinearGradient
           colors={['rgba(20,21,24,0.96)', 'rgba(10,11,13,0.98)']}
           start={{ x: 0, y: 0 }}
@@ -113,8 +177,17 @@ export function NotePadSheet(): ReactElement | null {
         />
         <View pointerEvents="none" style={topHighlightStyle} />
 
-        {/* Drag handle — decorative this phase. */}
-        <View style={dragHandleStyle} />
+        {/* Drag-handle zone — large invisible tap target wraps a small
+            visible pill. Pan responder lives only here, so the inner legs
+            list owns its own vertical scroll without contention. */}
+        <View
+          accessibilityRole="adjustable"
+          accessibilityLabel="Drag down to close"
+          style={dragHandleZoneStyle}
+          {...panResponder.panHandlers}
+        >
+          <View pointerEvents="none" style={dragHandlePillStyle} />
+        </View>
 
         {/* Header */}
         <View style={headerRowStyle}>
@@ -228,14 +301,20 @@ const topHighlightStyle: ViewStyle = {
   backgroundColor: 'rgba(255,255,255,0.06)',
 };
 
-const dragHandleStyle: ViewStyle = {
+const dragHandleZoneStyle: ViewStyle = {
+  paddingTop: 8,
+  paddingBottom: 8,
+  paddingHorizontal: 60,
   alignSelf: 'center',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
+const dragHandlePillStyle: ViewStyle = {
   width: 40,
   height: 4,
   borderRadius: 2,
-  backgroundColor: 'rgba(255,255,255,0.15)',
-  marginTop: 8,
-  marginBottom: 8,
+  backgroundColor: 'rgba(255,255,255,0.18)',
 };
 
 const headerRowStyle: ViewStyle = {

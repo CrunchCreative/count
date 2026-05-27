@@ -143,10 +143,10 @@ const triggerStyle: ViewStyle = {
   gap: 8,
   paddingHorizontal: 12,
   paddingVertical: 9,
-  borderRadius: 8,
+  borderRadius: 7,
   borderWidth: StyleSheet.hairlineWidth,
-  borderColor: colors.border.default,
-  backgroundColor: 'rgba(255,255,255,0.02)',
+  borderColor: colors.border.strong,
+  backgroundColor: 'rgba(255,255,255,0.04)',
 };
 
 const pressedStyle: ViewStyle = { opacity: 0.7 };

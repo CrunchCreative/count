@@ -1,24 +1,25 @@
 // Dashboard — Home tab. Ports docs/design-source/the-count-v2/project/screens/dashboard.jsx.
-// Branding header → hero carousel → greeting → today's row → featured match
-// (minus tug-of-war) → top research → pickup → scan.
+// Hero carousel → greeting → today's row → featured match (minus tug-of-war) →
+// top research → pickup → scan.
 //
-// RadialBackdrop is rendered once at the root layout — not here.
-// Navigation to /fixture/[id] is stubbed until Phase 3 ships that route.
+// Logo + profile chrome live in the persistent AppHeader at the tab-layout
+// level; the dashboard no longer renders its own header. RadialBackdrop is
+// rendered once at the root layout — not here.
 //
 // Page horizontal padding: 12. Panels use their own 16-20px internal padding
-// for content breathing room. Matches the design source's edge-of-screen rhythm.
+// for content breathing room.
 
 import type { ReactElement } from 'react';
-import { Image, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import {
+  APP_HEADER_CONTENT_HEIGHT,
   FeaturedMatch,
   FixtureCard,
   HeroCarousel,
   HScroll,
   Icon,
-  IconButton,
   PickupCard,
   ResearchCard,
   ScanCard,
@@ -34,184 +35,144 @@ import { getTeam } from '@/src/mock/teams';
 
 const PAGE_X = 12;
 
-// Logo natural dimensions: 3508 × 1363, aspect ratio ≈ 2.574. Rendered at height 50.
-const LOGO_NATURAL_W = 3508;
-const LOGO_NATURAL_H = 1363;
-const LOGO_HEIGHT = 50;
-const LOGO_WIDTH = LOGO_HEIGHT * (LOGO_NATURAL_W / LOGO_NATURAL_H);
-
 export default function HomeScreen(): ReactElement {
+  const insets = useSafeAreaInsets();
   const featuredHome = getTeam(FEATURED.home);
   const featuredAway = getTeam(FEATURED.away);
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: PAGE_X,
-          paddingTop: 0,
-          paddingBottom: 200,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Branding header */}
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 16,
-          }}
-        >
-          <Image
-            source={require('../../assets/count-logo.png')}
-            style={{ height: LOGO_HEIGHT, width: LOGO_WIDTH, marginLeft: -8 }}
-            resizeMode="contain"
-            accessibilityLabel="The Count"
-          />
-          <View style={{ flexDirection: 'row', gap: 6 }}>
-            <IconButton
-              icon="search"
-              accessibilityLabel="Search"
-              onPress={() => {
-                /* TODO: Phase 5 — router.push('/search') */
-              }}
-            />
-            <IconButton
-              icon="bell"
-              accessibilityLabel="Notifications"
-              onPress={() => {
-                /* TODO: Phase TBD — notifications */
-              }}
-            />
-          </View>
-        </View>
+    <ScrollView
+      contentContainerStyle={{
+        paddingHorizontal: PAGE_X,
+        paddingTop: insets.top + APP_HEADER_CONTENT_HEIGHT + 16,
+        paddingBottom: 200,
+      }}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Hero carousel */}
+      <HeroCarousel slides={CAROUSEL} />
 
-        {/* Hero carousel */}
-        <HeroCarousel slides={CAROUSEL} />
-
-        {/* Greeting */}
-        <View style={{ marginTop: 24 }}>
-          <Text style={metaStyle}>SATURDAY · 13 MAY</Text>
-          <Text style={greetingStyle}>Good morning, Ben</Text>
-          <Text style={greetingBodyStyle}>
-            14 fixtures today. The pattern engine has surfaced{' '}
-            <Text style={{ color: colors.teal.bright, fontWeight: typography.weight.medium }}>
-              11 strong angles
-            </Text>
-            {' '}with 5/5 hit rates across your followed leagues.
+      {/* Greeting */}
+      <View style={{ marginTop: 24 }}>
+        <Text style={metaStyle}>SATURDAY · 13 MAY</Text>
+        <Text style={greetingStyle}>Good morning, Ben</Text>
+        <Text style={greetingBodyStyle}>
+          14 fixtures today. The pattern engine has surfaced{' '}
+          <Text style={{ color: colors.teal.bright, fontWeight: typography.weight.medium }}>
+            11 strong angles
           </Text>
-        </View>
+          {' '}with 5/5 hit rates across your followed leagues.
+        </Text>
+      </View>
 
-        {/* Today's fixtures */}
-        <SectionHead label="TODAY’S FIXTURES" tone="utility" meta="Premier League · 1 of 6" />
-        <HScroll
-          data={TODAY}
-          keyExtractor={(f) => f.id}
-          renderItem={(f) => {
-            const home = getTeam(f.home);
-            const away = getTeam(f.away);
-            const homeName = home?.name ?? f.home;
-            const awayName = away?.name ?? f.away;
-            const label = `${homeName} versus ${awayName}, ${f.kickoff}, signal ${f.signal}`;
-            return (
-              <FixtureCard
-                fixture={f}
-                accessibilityLabel={label}
-                onPress={() => router.push(`/fixture/${f.id}`)}
-              />
-            );
-          }}
+      {/* Today's fixtures */}
+      <SectionHead label="TODAY’S FIXTURES" tone="utility" meta="Premier League · 1 of 6" />
+      <HScroll
+        data={TODAY}
+        keyExtractor={(f) => f.id}
+        renderItem={(f) => {
+          const home = getTeam(f.home);
+          const away = getTeam(f.away);
+          const homeName = home?.name ?? f.home;
+          const awayName = away?.name ?? f.away;
+          const label = `${homeName} versus ${awayName}, ${f.kickoff}, signal ${f.signal}`;
+          return (
+            <FixtureCard
+              fixture={f}
+              accessibilityLabel={label}
+              onPress={() => router.push(`/fixture/${f.id}`)}
+            />
+          );
+        }}
+      />
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 10,
+          marginTop: 12,
+        }}
+      >
+        <Icon name="chevron-left" size={12} color={colors.amber.bright} />
+        <Text style={hintRowStyle}>Swipe through 42 fixtures</Text>
+        <Icon name="chevron-right" size={12} color={colors.amber.bright} />
+      </View>
+
+      {/* Featured match */}
+      <SectionHead label="FEATURED MATCH" tone="engine" meta="Highest signal today" />
+      {featuredHome && featuredAway ? (
+        <FeaturedMatch
+          fixture={FEATURED}
+          homeTeam={featuredHome}
+          awayTeam={featuredAway}
+          onOpen={() => router.push(`/fixture/${FEATURED.id}`)}
         />
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 10,
-            marginTop: 12,
-          }}
-        >
-          <Icon name="chevron-left" size={12} color={colors.amber.bright} />
-          <Text style={hintRowStyle}>Swipe through 42 fixtures</Text>
-          <Icon name="chevron-right" size={12} color={colors.amber.bright} />
-        </View>
+      ) : null}
 
-        {/* Featured match */}
-        <SectionHead label="FEATURED MATCH" tone="engine" meta="Highest signal today" />
-        {featuredHome && featuredAway ? (
-          <FeaturedMatch
-            fixture={FEATURED}
-            homeTeam={featuredHome}
-            awayTeam={featuredAway}
-            onOpen={() => router.push(`/fixture/${FEATURED.id}`)}
+      {/* Top Research Today */}
+      <SectionHead label="TOP RESEARCH TODAY" tone="engine" meta="Ranked 2–4" />
+      <View style={{ gap: 12 }}>
+        {TOP_RESEARCH.map((r) => {
+          const home = getTeam(r.home);
+          const away = getTeam(r.away);
+          if (!home || !away) return null;
+          return (
+            <ResearchCard
+              key={r.id}
+              item={r}
+              homeTeam={home}
+              awayTeam={away}
+              onPress={() => router.push(`/fixture/${r.id}`)}
+            />
+          );
+        })}
+      </View>
+
+      {/* Pick up where you left off — each card flex:1 inside the row. */}
+      <SectionHead label="PICK UP WHERE YOU LEFT OFF" tone="utility" />
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View style={{ flex: 1 }}>
+          <PickupCard
+            meta="LAST VIEWED · 22 MIN AGO"
+            title="Newcastle vs Brighton"
+            sub="Player matrix · Last 5"
           />
-        ) : null}
-
-        {/* Top Research Today */}
-        <SectionHead label="TOP RESEARCH TODAY" tone="engine" meta="Ranked 2–4" />
-        <View style={{ gap: 12 }}>
-          {TOP_RESEARCH.map((r) => {
-            const home = getTeam(r.home);
-            const away = getTeam(r.away);
-            if (!home || !away) return null;
-            return (
-              <ResearchCard
-                key={r.id}
-                item={r}
-                homeTeam={home}
-                awayTeam={away}
-                onPress={() => router.push(`/fixture/${r.id}`)}
-              />
-            );
-          })}
         </View>
+        <View style={{ flex: 1 }}>
+          <PickupCard
+            meta="SAVED BUILDER · YESTERDAY"
+            title="Weekend corner build"
+            sub={
+              <Text style={pickupAmberSubStyle}>
+                +4.20 · 2 fixtures remaining
+              </Text>
+            }
+          />
+        </View>
+      </View>
 
-        {/* Pick up where you left off — each card flex:1 inside the row. */}
-        <SectionHead label="PICK UP WHERE YOU LEFT OFF" tone="utility" />
+      {/* Scan across fixtures */}
+      <SectionHead label="SCAN ACROSS FIXTURES" tone="utility" />
+      <View style={{ gap: 10 }}>
         <View style={{ flexDirection: 'row', gap: 10 }}>
           <View style={{ flex: 1 }}>
-            <PickupCard
-              meta="LAST VIEWED · 22 MIN AGO"
-              title="Newcastle vs Brighton"
-              sub="Player matrix · Last 5"
-            />
+            <ScanCard icon="flag" title="High corners" sub="7 fixtures · 8+ floor" />
           </View>
           <View style={{ flex: 1 }}>
-            <PickupCard
-              meta="SAVED BUILDER · YESTERDAY"
-              title="Weekend corner build"
-              sub={
-                <Text style={pickupAmberSubStyle}>
-                  +4.20 · 2 fixtures remaining
-                </Text>
-              }
-            />
+            <ScanCard icon="card" title="Cards-heavy refs" sub="3 fixtures today" />
           </View>
         </View>
-
-        {/* Scan across fixtures */}
-        <SectionHead label="SCAN ACROSS FIXTURES" tone="utility" />
-        <View style={{ gap: 10 }}>
-          <View style={{ flexDirection: 'row', gap: 10 }}>
-            <View style={{ flex: 1 }}>
-              <ScanCard icon="flag" title="High corners" sub="7 fixtures · 8+ floor" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <ScanCard icon="card" title="Cards-heavy refs" sub="3 fixtures today" />
-            </View>
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <View style={{ flex: 1 }}>
+            <ScanCard icon="target" title="Shots on target" sub="Player props · L5" />
           </View>
-          <View style={{ flexDirection: 'row', gap: 10 }}>
-            <View style={{ flex: 1 }}>
-              <ScanCard icon="target" title="Shots on target" sub="Player props · L5" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <ScanCard icon="sparkles" title="Ask the AI" sub="Natural language" />
-            </View>
+          <View style={{ flex: 1 }}>
+            <ScanCard icon="sparkles" title="Ask the AI" sub="Natural language" />
           </View>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </ScrollView>
   );
 }
 
