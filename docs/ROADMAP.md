@@ -23,19 +23,17 @@ V1 must include: empty/loading/error states for every screen, age gate (17+ iOS,
 
 ## Current position
 
-**Done:** Phases 0, 0.5, 1A, 1B, 1C, 2A, 2B. Foundation, design system, atomic primitives, app shell, full Dashboard. App boots on real iPhone via Expo Go with backdrop + glass panels + auto-advancing hero + 4-section content all rendering correctly. See PROJECT-STATE.md for detail.
+**Done:** Phases 0, 0.5, 1A, 1B, 1C, 2A, 2B, 3, 3.5, 3.6, 3.6.1, 3.6.2. Foundation, design system, atomic primitives, app shell, full Dashboard, Note Pad subsystem, Fixtures listing, fixture detail route stub, persistent header with scroll-driven blur, scroll reset on tab focus, filter chip rendering. App boots on real iPhone via Expo Go.
 
-**Next:** Phase 3 (Note Pad + Fixtures list + fixture detail route stub).
+**Next:** Phase 4 — fixture detail tab contents (Overview, Team stats, Player stats).
 
-**Remaining work to V1:** ~10 phases. Three are UI-with-mock-data (fixture-detail content split across Phases 3–5, plus Phase 7 search/builders), one is the pattern engine (Phase 6), three are data infrastructure (Phases 8–10), one is engine integration (Phase 11), one is polish + submission (Phase 12).
-
-The fixture-detail screen turned out larger than originally scoped. What was a single "Phase 3" (Summary / Matrix / AI tabs in one go) is now split into Phases 3, 4, 5 — Note Pad subsystem first, then the bulk of the tab content, then the engine-driven tab plus the tug-of-war back-fill.
+**Remaining work to V1:** ~9 phases. Two are UI-with-mock-data (Phase 4 fixture-detail tabs, Phase 5 The Count tab, Phase 7 search/builders), one is the pattern engine (Phase 6), three are data infrastructure (Phases 8–10), one is engine integration (Phase 11), one is polish + submission (Phase 12).
 
 ---
 
 ## Phase plan
 
-Each phase is one Claude Code session unless flagged otherwise. Phases run sequentially unless marked parallelisable.
+Each phase is one Claude Code session unless flagged otherwise. Phases run sequentially unless marked parallelisable. Sub-phases (e.g. 3.5, 3.6) are surgical follow-ups that emerged during device testing — fully shipped, banked in PROJECT-STATE's "done" list.
 
 ### Phase 2.5 — Sportmonks API spike
 
@@ -50,32 +48,7 @@ No code written. Notes captured for reference.
 **Depends on:** nothing.
 **Output:** A short notes doc (`docs/sportmonks-spike.md`) summarising endpoint shapes and confirming the three checks above.
 **Effort:** ~1 hour, Nick alone.
-**Parallelisable with:** Phase 3.
-
-### Phase 3 — Note Pad subsystem + Fixtures listing + fixture detail route stub
-
-Build the NotePad context, provider, hook, sheet, and leg-row from scratch (Phase 2A shipped only the visual `NotePadBar` chrome — `pointerEvents="none"`, no state, no hook). Replace the Fixtures tab stub with the full `FixturesList` screen — date strip, comp filter, league-grouped fixture cards with addable Safe pills. Stand up `/fixture/[id]` as a route with the header, H1, and tab strip showing the four labels (**Overview · Team stats · Player stats · The Count**) — but no tab content yet, just a placeholder slot. Dashboard fixture-row `onPress` TODOs wire up to the new route.
-
-This is where the *first interactive addable mechanic* ships. Tapping a `+` Safe pill on a fixture card adds the leg to the Note Pad. The Note Pad bar shows the real count. Tapping the bar opens a sheet with all added legs and a clear-all + "Save to Builders" footer (Save stubbed to a toast until Phase 7).
-
-**Includes:**
-- `NotePadProvider` / `useNotePad` / `NotePadSheet` / `NotePadLegRow` (all new)
-- `SafePill` extension: new `leg?: Leg` prop adds Pressable + isInPad behaviour. Existing `addable?: boolean` prop kept for visual-only affordance (Dashboard `ResearchCard` continues to use it). Two separate concerns, both supported.
-- `FixturesList` + `FixtureLeagueSection` + `FixtureListCard` + `DateChip` + `CompChip` + `GlassSelect` (all new in `@count/ui`)
-- `Tab` + `TabStrip` primitives (new — used by the route stub here, fully consumed in Phase 4)
-- `/fixture/[id]` route stub (Expo Router)
-- Dashboard fixture-row `onPress` handlers wired to `router.push(/fixture/{id})`
-- Typed mock data port of `FIXTURES_ALL` from the design source
-
-**Out of scope this phase:**
-- The four tab contents — Phase 4 (Overview / Team stats / Player stats) and Phase 5 (The Count).
-- The Save-to-Builders write flow — Phase 7.
-- Tug-of-war chart — Phase 5.
-- Date strip and filter chip aren't yet wired to filter data (visually selectable but no data filter applied).
-
-**Depends on:** Phase 2B. ✓ done.
-**Output:** Fixtures tab fully populated and tappable, Note Pad subsystem live, route stub navigable from Dashboard and Fixtures.
-**Effort:** 1 Claude Code session.
+**Parallelisable with:** Phase 4.
 
 ### Phase 4 — Fixture detail tab contents: Overview, Team stats, Player stats
 
@@ -87,11 +60,11 @@ Three of the four tabs filled in:
 
 The Count tab remains a stub (placeholder under the tab content slot).
 
-**Brief discipline (lesson from Phase 2B):** The comparative-grid tabs are denser and more compound than anything yet shipped. The 2B brief implied component flex/layout via "same as source" and Claude Code misread `ResearchCard`'s row-direction angle inset as column. For Phase 4, every compound component spec needs to state parent flex-direction, sibling order, and child sizing rules explicitly. Don't assume the agent can infer layout from the prototype.
+**Brief discipline (lessons from Phase 2B + 3.5/3.6.2):** The comparative-grid tabs are denser and more compound than anything yet shipped. Every compound component spec MUST state parent flex-direction, sibling order, and child sizing rules explicitly. CSS values from the design source MUST be cited by selector AND line number, with parent/child DOM relationships called out so segments-vs-containers don't get conflated. Don't assume the agent can infer layout from the prototype.
 
-**Depends on:** Phase 3 (Note Pad context, tab strip, route, addable Safe pills).
+**Depends on:** Phase 3 ✓ done. Phase 2.5 ideally (Sportmonks shapes for xG/xGoT) — but mock data can proceed without.
 **Output:** Three of four fixture-detail tabs working with mock data. Addable pills on each tab feed the Note Pad.
-**Effort:** 1–2 Claude Code sessions. Team stats grid alone is substantial.
+**Effort:** 1–2 Claude Code sessions. Team stats grid alone is substantial — likely splits into 4A (Overview + tab strip wiring) and 4B (Team stats + Player stats grids).
 
 ### Phase 5 — The Count tab + Dashboard tug-of-war back-fill
 
@@ -113,7 +86,7 @@ Implement `@count/pattern-engine`. Pure TypeScript. Given a typed input (fixture
 
 **Why now:** the screens are built; we know exactly what outputs they consume. The engine isn't speculative.
 
-**Depends on:** Phases 3, 4, 5 (so we know what outputs are needed). Phase 2.5 ideally (so we know what input shapes Sportmonks delivers).
+**Depends on:** Phases 4, 5 (so we know what outputs are needed). Phase 2.5 ideally (so we know what input shapes Sportmonks delivers).
 **Output:** A unit-tested deterministic engine that the mock data layer can adopt.
 **Effort:** 1 long Claude Code session. The engine maths matters more than the framing.
 
@@ -123,7 +96,7 @@ Search screen (preset filters, custom searches, "Ask The Count" natural-language
 
 **Save-to-Builders flow becomes real here.** The Phase 3 stubbed CTA now writes to a `builders` store and clears the Note Pad. The Builders screen reads from that store. Persistence is local-only (AsyncStorage) until Phase 8 brings Supabase in.
 
-**Depends on:** Phases 3 + 5 (uses Note Pad and shared primitives).
+**Depends on:** Phases 3 ✓ + 5 (uses Note Pad and shared primitives).
 **Output:** All 5 primary screens of the app are now navigable with mock data. App is feature-complete-looking, just not data-real.
 **Effort:** 1–2 Claude Code sessions.
 
@@ -165,7 +138,7 @@ Engine-assisted Suggested Builder generation. Natural-language search ("Ask The 
 
 Empty / loading / error states audited everywhere. Accessibility pass (VoiceOver, TalkBack, text scaling, contrast). Age gate. App Store / Play Store listing copy. Privacy policy. Terms. Test on multiple device sizes. App icons, splash screens, screenshots for store listings. EAS Build + EAS Submit configuration. First-submission shepherding through Apple's review (expect 2–3 weeks back-and-forth on a gambling-adjacent app).
 
-Includes deferred items: Android device pass (still pending from Phase 2A/2B and any earlier UI phase), logo PNG re-export with proper glow bleed, font decision (Söhne licensed vs Inter).
+Includes deferred items: Android device pass (still pending from Phases 2A/2B/3 and all 3.5/3.6 sub-phases), logo PNG re-export with proper glow bleed, font decision (Söhne licensed vs Inter).
 
 **Depends on:** Phase 11 (everything else is done).
 **Output:** Live on App Store and Google Play.
@@ -175,9 +148,9 @@ Includes deferred items: Android device pass (still pending from Phase 2A/2B and
 
 ## Critical path
 
-UI-and-engine track: Phases 3 → 4 → 5 → 6 → 7. Data track: Phases 8 → 9 → 10. The Count integration: Phase 11. Submission gate: Phase 12.
+UI-and-engine track: Phases 4 → 5 → 6 → 7. Data track: Phases 8 → 9 → 10. The Count integration: Phase 11. Submission gate: Phase 12.
 
-The longest single-task risk is Apple review on the first submission. The longest single-phase risks are Phase 9 (ingestion pipeline — Sportmonks rate limits and data shape mismatches are real and hard to predict) and Phase 4 (the comparative-grid tabs — densest layout work in the codebase, where the Phase 2B "agent misreads layout direction" pattern would hurt most).
+The longest single-task risk is Apple review on the first submission. The longest single-phase risks are Phase 9 (ingestion pipeline — Sportmonks rate limits and data shape mismatches are real and hard to predict) and Phase 4 (the comparative-grid tabs — densest layout work in the codebase, where the Phase 2B "agent misreads layout direction" pattern + Phase 3.5/3.6.2 "agent misreads CSS container/segment relationships" pattern would hurt most).
 
 Nothing else is fundamentally blocking.
 
@@ -205,7 +178,7 @@ After every shipped phase, this file gets updated:
 
 1. The phase moves from "remaining" to "done" — mark it complete in PROJECT-STATE.md too.
 2. If the phase taught us something that changes future phases, edit those phases' scope.
-3. If a new phase needs inserting (unknown unknowns surface), add it with a sensible number.
+3. If a new phase needs inserting (unknown unknowns surface), add it with a sensible number — sub-phase suffixes (3.5, 3.6) for surgical follow-ups, full integer increments for new major phases.
 4. **Re-upload both PROJECT-STATE.md and ROADMAP.md to the Claude project files panel** so future chats see the current version. The repo is the source of truth but chats only see what's in the panel.
 
 This is Nick's discipline to maintain. If a chat detects ROADMAP.md is stale (e.g. references phases we've talked about completing but it doesn't reflect), prompt to update.
