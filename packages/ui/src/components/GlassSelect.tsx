@@ -14,13 +14,12 @@
 
 import { useState, type ReactElement } from 'react';
 import {
+  Platform,
   Pressable,
-  StyleSheet,
   Text,
   View,
   type ViewStyle,
 } from 'react-native';
-import { Platform } from 'react-native';
 import { colors, radii, typography } from '@count/tokens';
 import { Icon } from './Icon';
 
@@ -38,6 +37,10 @@ export interface GlassSelectProps {
   onChange: (id: string) => void;
   /** When true, render the amber leading dot. Indicates a non-default filter is active. */
   filteringActive?: boolean;
+  /** Optional leading uppercase micro-label, e.g. "WINDOW". Rendered before
+   *  the current value with a small dot separator. Knocked-back mono text.
+   *  Independent of `filteringActive` — both can render together. */
+  label?: string;
 }
 
 export function GlassSelect({
@@ -45,11 +48,13 @@ export function GlassSelect({
   options,
   onChange,
   filteringActive,
+  label,
 }: GlassSelectProps): ReactElement {
   const [open, setOpen] = useState(false);
   const current = options.find((o) => o.id === value);
-  const label = current?.label ?? 'Select…';
+  const currentLabel = current?.label ?? 'Select…';
   const count = current?.count;
+  const a11yLabel = label ? `${label}, ${currentLabel}` : currentLabel;
 
   return (
     <View style={wrapStyle}>
@@ -57,12 +62,14 @@ export function GlassSelect({
         onPress={() => setOpen((v) => !v)}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
-        accessibilityLabel={label}
+        accessibilityLabel={a11yLabel}
         style={triggerStyle}
       >
         {filteringActive ? <View style={dotStyle} /> : null}
+        {label ? <Text style={prefixLabelStyle}>{label}</Text> : null}
+        {label ? <View style={prefixSeparatorStyle} /> : null}
         <Text style={triggerLabelStyle} numberOfLines={1}>
-          {label}
+          {currentLabel}
         </Text>
         {typeof count === 'number' ? (
           <Text style={countStyle}>{count}</Text>
@@ -137,6 +144,26 @@ const triggerLabelStyle = {
   fontFamily: typography.fontSans,
   fontSize: 13,
   fontWeight: typography.weight.regular,
+};
+
+// 4B.1 — leading uppercase mono prefix label + separator dot. Rendered when
+// the new `label` prop is set (e.g. "WINDOW"). Knocked-back text colour so
+// the user's eye lands on the current value, not the field name.
+const prefixLabelStyle = {
+  color: colors.text.hint,
+  fontFamily: typography.fontMono,
+  fontSize: 10,
+  fontWeight: typography.weight.regular,
+  letterSpacing: 0.4,
+  textTransform: 'uppercase' as const,
+};
+
+const prefixSeparatorStyle: ViewStyle = {
+  width: 3,
+  height: 3,
+  borderRadius: 1.5,
+  backgroundColor: 'rgba(255,255,255,0.20)',
+  marginHorizontal: 6,
 };
 
 const countStyle = {

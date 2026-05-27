@@ -141,7 +141,7 @@ export function FixtureListCard({
               hits={hits}
               total={5}
               tier={angle.tier}
-              size="std"
+              size="small"
               leg={leg}
             />
           ) : (
@@ -150,7 +150,7 @@ export function FixtureListCard({
               hits={hits}
               total={5}
               tier={angle.tier}
-              size="std"
+              size="small"
             />
           )}
           <Text style={angleTitleStyle} numberOfLines={1}>

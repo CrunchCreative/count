@@ -14,8 +14,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { IconButton, TabStrip } from '@count/ui';
 import { colors, typography } from '@count/tokens';
 
-import { FIXTURES_BY_ID } from '@/src/mock/fixtures-all';
+import { OverviewTab } from '@/src/components/fixture/OverviewTab';
+import { TabPlaceholder } from '@/src/components/fixture/TabPlaceholder';
+import { TeamStatsTab } from '@/src/components/fixture/TeamStatsTab';
+import { getFixtureDetail } from '@/src/mock/fixture-details';
 import { getTeam } from '@/src/mock/teams';
+
+type TabId = 'overview' | 'team' | 'player' | 'count';
 
 const PAGE_X = 16;
 
@@ -28,8 +33,8 @@ const TABS = [
 
 export default function FixtureDetailScreen(): ReactElement {
   const params = useLocalSearchParams<{ id?: string }>();
-  const fixture = params.id ? FIXTURES_BY_ID[params.id] : undefined;
-  const [tab, setTab] = useState<string>('overview');
+  const fixture = params.id ? getFixtureDetail(params.id) : undefined;
+  const [tab, setTab] = useState<TabId>('overview');
 
   const homeTeam = fixture ? getTeam(fixture.home) : undefined;
   const awayTeam = fixture ? getTeam(fixture.away) : undefined;
@@ -82,13 +87,22 @@ export default function FixtureDetailScreen(): ReactElement {
 
         {/* Tab strip */}
         <View style={tabStripWrapStyle}>
-          <TabStrip tabs={TABS} activeId={tab} onChange={setTab} />
+          <TabStrip tabs={TABS} activeId={tab} onChange={(id) => setTab(id as TabId)} />
         </View>
 
-        {/* Tab content slot — placeholder for Phase 4 / 5 */}
-        <View style={placeholderWrapStyle}>
-          <Text style={placeholderStyle}>Tab content arrives in Phase 4.</Text>
-        </View>
+        {/* Tab content router. Each branch guards on `fixture` — the H1's
+            "Unknown fixture" path handles the no-fixture case visually; tab
+            content shouldn't try to render without a record. */}
+        {tab === 'overview' && fixture ? <OverviewTab fixture={fixture} /> : null}
+        {tab === 'team' && fixture ? (
+          <TeamStatsTab fixture={fixture} />
+        ) : null}
+        {tab === 'player' && fixture ? (
+          <TabPlaceholder phase="4C" tabName="Player stats" />
+        ) : null}
+        {tab === 'count' && fixture ? (
+          <TabPlaceholder phase="5" tabName="The Count" />
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -145,18 +159,4 @@ const vsInlineStyle = {
 
 const tabStripWrapStyle: ViewStyle = {
   marginTop: 16,
-};
-
-const placeholderWrapStyle: ViewStyle = {
-  flex: 1,
-  alignItems: 'center',
-  justifyContent: 'center',
-  paddingVertical: 64,
-};
-
-const placeholderStyle = {
-  color: colors.text.muted,
-  fontFamily: typography.fontSans,
-  fontSize: 13,
-  fontWeight: typography.weight.regular,
 };

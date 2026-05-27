@@ -22,7 +22,7 @@ export function NotePadLegRow({ leg, onRemove }: NotePadLegRowProps): ReactEleme
         hits={leg.hits}
         total={leg.total}
         tier={leg.tier}
-        size="std"
+        size="small"
       />
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={titleStyle} numberOfLines={2}>

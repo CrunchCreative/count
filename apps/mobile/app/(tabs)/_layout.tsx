@@ -1,54 +1,14 @@
-import { Tabs, usePathname, useRouter, type Href } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import { View } from 'react-native';
-import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import {
-  AppHeader,
-  BottomNav,
-  NotePadBar,
-  ScrollProvider,
-  type BottomNavTab,
-} from '@count/ui';
+import { AppHeader, ScrollProvider } from '@count/ui';
 
-const TABS: BottomNavTab[] = [
-  { key: 'index',    label: 'Home',     icon: 'home' },
-  { key: 'fixtures', label: 'Fixtures', icon: 'calendar' },
-  { key: 'search',   label: 'Search',   icon: 'search' },
-  { key: 'builders', label: 'Builders', icon: 'builders' },
-  { key: 'profile',  label: 'Profile',  icon: 'profile' },
-];
-
-const ROUTE_FOR_KEY: Record<string, Href> = {
-  index: '/',
-  fixtures: '/fixtures',
-  search: '/search',
-  builders: '/builders',
-  profile: '/profile',
-};
-
-function activeKeyFromPath(pathname: string): string {
-  if (pathname.endsWith('/fixtures')) return 'fixtures';
-  if (pathname.endsWith('/search')) return 'search';
-  if (pathname.endsWith('/builders')) return 'builders';
-  if (pathname.endsWith('/profile')) return 'profile';
-  return 'index';
-}
-
-function CustomTabBar(_: BottomTabBarProps) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const activeKey = activeKeyFromPath(pathname);
-
-  return (
-    <BottomNav
-      tabs={TABS}
-      activeKey={activeKey}
-      onSelect={(key) => {
-        const route = ROUTE_FOR_KEY[key];
-        if (route) router.navigate(route);
-      }}
-    />
-  );
-}
+// Phase 4A.2: `BottomNav` and `NotePadBar` moved to root `_layout.tsx` so
+// they stay mounted across non-tab routes (fixture/[id]). The Tabs navigator
+// stays — it preserves per-tab scroll state (decision: keep tab semantics).
+// We suppress its default tab bar via `tabBar={() => null}` AND
+// `tabBarStyle: { display: 'none' }` so no native bar paints over the
+// hoisted custom one. AppHeader stays scoped here (decision 13 — header
+// hides on fixture detail).
 
 export default function TabLayout() {
   return (
@@ -58,20 +18,12 @@ export default function TabLayout() {
     <ScrollProvider>
       <View style={{ flex: 1 }}>
         <Tabs
-          tabBar={(props) => <CustomTabBar {...props} />}
+          tabBar={() => null}
           screenOptions={{
             headerShown: false,
+            tabBarStyle: { display: 'none' },
           }}
         />
-        {/* NotePadBar lives OUTSIDE the React Navigation tabBar slot.
-            Earlier passes nested it inside the tabBar wrapper alongside
-            BottomNav; v7 RN's BottomTabBarHeightContext + slot positioning
-            made the inner absolute child unpredictable on device (sometimes
-            missing, sometimes mis-positioned). Mounting it here against
-            this `flex: 1` View — which has known measurable bounds — makes
-            its `bottom: insets.bottom + NAV_CONTENT_HEIGHT` anchor reliably
-            to the screen bottom. */}
-        <NotePadBar />
         {/* Persistent app header — absolute at the top of every tab screen. */}
         <TabsAppHeader />
       </View>

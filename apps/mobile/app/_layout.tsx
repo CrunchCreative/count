@@ -1,11 +1,18 @@
 import '../global.css';
 import { DarkTheme, ThemeProvider, type Theme } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import 'react-native-reanimated';
 
-import { NotePadProvider, NotePadSheet, RadialBackdrop } from '@count/ui';
+import {
+  BottomNav,
+  NotePadBar,
+  NotePadProvider,
+  NotePadSheet,
+  RadialBackdrop,
+  type BottomNavTab,
+} from '@count/ui';
 import { colors } from '@count/tokens';
 
 export const unstable_settings = {
@@ -25,6 +32,25 @@ const TransparentDarkTheme: Theme = {
   },
 };
 
+// Bottom-nav metadata is owned at root so the nav can mount above every
+// route (Phase 4A.2). It used to live inside `(tabs)/_layout.tsx` as the
+// `tabBar` render prop's wrapper.
+const TABS: BottomNavTab[] = [
+  { key: 'index',    label: 'Home',     icon: 'home' },
+  { key: 'fixtures', label: 'Fixtures', icon: 'calendar' },
+  { key: 'search',   label: 'Search',   icon: 'search' },
+  { key: 'builders', label: 'Builders', icon: 'builders' },
+  { key: 'profile',  label: 'Profile',  icon: 'profile' },
+];
+
+const ROUTE_FOR_KEY: Record<string, Href> = {
+  index: '/',
+  fixtures: '/fixtures',
+  search: '/search',
+  builders: '/builders',
+  profile: '/profile',
+};
+
 export default function RootLayout() {
   return (
     <NotePadProvider>
@@ -42,11 +68,39 @@ export default function RootLayout() {
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           </Stack>
         </ThemeProvider>
+        {/* Persistent bottom chrome — mounted at root so it stays visible on
+            every route, including fixture/[id]. NotePadBar sits above
+            BottomNav via its own absolute positioning (insets.bottom + 70). */}
+        <RootBottomNav />
+        <NotePadBar />
         {/* Note Pad sheet — absolute-positioned sibling, above all navigators.
             Mounts always; renders nothing while closed (gotcha-free). */}
         <NotePadSheet />
         <StatusBar style="light" />
       </View>
     </NotePadProvider>
+  );
+}
+
+// Active-key derivation uses `useSegments()` so non-(tabs) routes (e.g.
+// fixture/[id]) cleanly produce no match — `''` doesn't equal any tab.key,
+// so no tab highlights. The legacy path-suffix logic fell through to
+// 'index' for unknown paths, which would have lit Home on fixture detail.
+function RootBottomNav() {
+  const segments = useSegments();
+  const router = useRouter();
+
+  const inTabs = segments[0] === '(tabs)';
+  const activeKey = inTabs ? (segments[1] ?? 'index') : '';
+
+  return (
+    <BottomNav
+      tabs={TABS}
+      activeKey={activeKey}
+      onSelect={(key) => {
+        const route = ROUTE_FOR_KEY[key];
+        if (route) router.navigate(route);
+      }}
+    />
   );
 }

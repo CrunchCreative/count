@@ -42,7 +42,7 @@ export function ScorePill({ result, wdl }: ScorePillProps) {
 
   const innerStyle: ViewStyle = {
     paddingVertical: 3,
-    paddingHorizontal: 5,
+    paddingHorizontal: 9,
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
@@ -66,7 +66,7 @@ export function ScorePill({ result, wdl }: ScorePillProps) {
         style={{
           color: spec.text,
           fontFamily: typography.fontMono,
-          fontSize: 10,
+          fontSize: 9,
           fontWeight: typography.weight.medium,
           letterSpacing: 0.2,
           lineHeight: 12,

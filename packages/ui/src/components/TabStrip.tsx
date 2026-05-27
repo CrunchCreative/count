@@ -3,8 +3,7 @@
 // Phase 3 (revisit if jank appears in Phase 4).
 
 import type { ReactElement } from 'react';
-import { StyleSheet, View, type ViewStyle } from 'react-native';
-import { colors } from '@count/tokens';
+import { View, type ViewStyle } from 'react-native';
 import { Tab } from './Tab';
 
 export interface TabSpec {
@@ -34,8 +33,12 @@ export function TabStrip({ tabs, activeId, onChange }: TabStripProps): ReactElem
   );
 }
 
+// `marginTop: 6` matches source `.tabs` (styles.css line 380).
+// Bottom hairline uses 1pt at 0.14 alpha — per gotcha #11, the default
+// hairline-width @ 0.06 alpha is invisible on iPhone dark backgrounds.
 const stripStyle: ViewStyle = {
   flexDirection: 'row',
-  borderBottomWidth: StyleSheet.hairlineWidth,
-  borderBottomColor: colors.border.default,
+  marginTop: 6,
+  borderBottomWidth: 1,
+  borderBottomColor: 'rgba(255,255,255,0.14)',
 };

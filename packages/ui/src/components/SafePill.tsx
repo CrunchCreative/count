@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, glows, typography } from '@count/tokens';
 import type { Leg } from '@count/types';
@@ -8,7 +8,12 @@ import { useNotePad } from '../context/NotePadContext';
 import { Icon } from './Icon';
 
 export type SafePillTier = 'teal' | 'amber' | 'muted';
-export type SafePillSize = 'std' | 'mini';
+/** Visual size. 'small' is byte-identical to the pre-4B.1 default. 'large' is
+ *  the matrix sticky-left variant — bigger paddings, mono numerics, and a
+ *  stronger iOS tier-tinted shadow that bleeds outside the rounded corners.
+ *  The old 'std' / 'mini' names are gone; 'mini' was unused and 'std' was
+ *  renamed to 'small' wholesale. */
+export type SafePillSize = 'small' | 'large';
 
 export interface SafePillProps {
   threshold: string | number;
@@ -64,6 +69,25 @@ const tierSpecs: Record<SafePillTier, TierSpec> = {
   },
 };
 
+// 4B.1 large-variant tier shadows — stronger than the default tier glow so
+// the SafePill reads as the focal point of the matrix sticky column. iOS
+// only; Android falls back to the existing AndroidGlowUnderlay sibling.
+const largeIosShadow: Record<SafePillTier, ViewStyle> = {
+  teal: {
+    shadowColor: colors.teal.bright,
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 0 },
+  },
+  amber: {
+    shadowColor: colors.amber.bright,
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 0 },
+  },
+  muted: {},
+};
+
 function deriveTier(hits: number, total: number): SafePillTier {
   if (hits === total) return 'teal';
   if (hits >= total - 1) return 'amber';
@@ -80,14 +104,14 @@ export function SafePill({
   hits,
   total = 5,
   tier,
-  size = 'std',
+  size = 'small',
   onPress,
   addable,
   leg,
 }: SafePillProps) {
   const resolvedTier = tier ?? deriveTier(hits, total);
   const spec = tierSpecs[resolvedTier];
-  const isMini = size === 'mini';
+  const isLarge = size === 'large';
 
   // Note Pad binding — only call hook side-effects when `leg` is present,
   // but the hook itself is unconditional (hooks must be called in order).
@@ -101,20 +125,28 @@ export function SafePill({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: isMini ? 2 : 4,
-    paddingHorizontal: isMini ? 5 : 8,
-    borderRadius: isMini ? 4 : 6,
-    minWidth: isMini ? 28 : 36,
+    paddingVertical: isLarge ? 5 : 4,
+    paddingHorizontal: isLarge ? 10 : 8,
+    borderRadius: 6,
+    minWidth: isLarge ? 48 : 36,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: spec.border,
     backgroundColor: spec.flat ?? 'transparent',
     overflow: 'hidden',
   };
 
+  // Outer paint surface — shadows must live here so they bleed outside the
+  // border-radius. Pre-merge the platform-conditional shadow into a single
+  // static object (gotcha #10 — Pressable can drop properties from arrays
+  // containing inline-conditional ViewStyle pieces).
   const outerStyle: ViewStyle = {
-    borderRadius: isMini ? 4 : 6,
+    borderRadius: 6,
     ...(spec.glow ? glowStyle(spec.glow) : {}),
+    ...(isLarge && Platform.OS === 'ios' ? largeIosShadow[resolvedTier] : {}),
   };
+
+  const thresholdFontSize = isLarge ? 14 : 12;
+  const hitsFontSize = isLarge ? 11 : 9;
 
   const content = (
     <View style={containerStyle}>
@@ -131,33 +163,31 @@ export function SafePill({
         <Text
           style={{
             color: spec.text,
-            fontFamily: typography.fontSans,
-            fontSize: isMini ? 10 : 12,
+            fontFamily: isLarge ? typography.fontMono : typography.fontSans,
+            fontSize: thresholdFontSize,
             fontWeight: typography.weight.medium,
-            lineHeight: isMini ? 12 : 14,
+            lineHeight: thresholdFontSize + 3,
           }}
         >
           {String(threshold)}
         </Text>
-        {!isMini ? (
-          <Text
-            style={{
-              color: spec.text,
-              fontFamily: typography.fontSans,
-              fontSize: 9,
-              fontWeight: typography.weight.regular,
-              opacity: 0.85,
-              marginTop: 2,
-              lineHeight: 10,
-            }}
-          >
-            {`${hits}/${total}`}
-          </Text>
-        ) : null}
+        <Text
+          style={{
+            color: spec.text,
+            fontFamily: isLarge ? typography.fontMono : typography.fontSans,
+            fontSize: hitsFontSize,
+            fontWeight: typography.weight.regular,
+            opacity: 0.85,
+            marginTop: 2,
+            lineHeight: hitsFontSize + 2,
+          }}
+        >
+          {`${hits}/${total}`}
+        </Text>
       </View>
       {showGlyph ? (
         <View style={{ marginLeft: 4, opacity: inPad ? 1 : 0.6 }}>
-          <Icon name={glyphIcon} size={8} color={spec.text} />
+          <Icon name={glyphIcon} size={isLarge ? 10 : 8} color={spec.text} />
         </View>
       ) : null}
     </View>
@@ -170,23 +200,34 @@ export function SafePill({
     return (
       <Pressable
         onPress={resolvedPress}
-        style={({ pressed }) => [outerStyle, pressed && pressedStyle]}
+        style={outerStyle}
       >
-        {spec.glow && shouldRenderAndroidGlow ? (
-          <AndroidGlowUnderlay glow={spec.glow} radius={isMini ? 4 : 6} />
-        ) : null}
-        {content}
+        {({ pressed }) => (
+          <View style={pressed ? pressedWrapStyle : staticWrapStyle}>
+            {spec.glow && shouldRenderAndroidGlow ? (
+              <AndroidGlowUnderlay glow={spec.glow} radius={6} />
+            ) : null}
+            {content}
+          </View>
+        )}
       </Pressable>
     );
   }
   return (
     <View style={outerStyle}>
       {spec.glow && shouldRenderAndroidGlow ? (
-        <AndroidGlowUnderlay glow={spec.glow} radius={isMini ? 4 : 6} />
+        <AndroidGlowUnderlay glow={spec.glow} radius={6} />
       ) : null}
       {content}
     </View>
   );
 }
 
-const pressedStyle: ViewStyle = { opacity: 0.7 };
+const staticWrapStyle: ViewStyle = {
+  borderRadius: 6,
+};
+
+const pressedWrapStyle: ViewStyle = {
+  borderRadius: 6,
+  opacity: 0.7,
+};

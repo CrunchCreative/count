@@ -7,3 +7,16 @@ export type { ResearchItem, ResearchAngle } from './research';
 export type { CarouselSlide, CarouselKind } from './carousel';
 export type { Leg, LegTier } from './leg';
 export type { FixtureListItem, FixturesByLeague } from './fixture-list';
+export type {
+  FixtureDetail,
+  FixtureWinProb,
+  FixtureRefereeDetail,
+  FixtureH2H,
+  StrongestAngle,
+  TeamMatrixStat,
+  TeamMatrixFixture,
+  TeamMatrixSide,
+  FixtureMatrix,
+  XGData,
+  FixtureXG,
+} from './fixture-detail';
