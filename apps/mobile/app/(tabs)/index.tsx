@@ -11,6 +11,7 @@
 import type { ReactElement } from 'react';
 import { Image, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import {
   FeaturedMatch,
   FixtureCard,
@@ -117,9 +118,7 @@ export default function HomeScreen(): ReactElement {
               <FixtureCard
                 fixture={f}
                 accessibilityLabel={label}
-                onPress={() => {
-                  /* TODO: Phase 3 — router.push(`/fixture/${f.id}`) */
-                }}
+                onPress={() => router.push(`/fixture/${f.id}`)}
               />
             );
           }}
@@ -145,9 +144,7 @@ export default function HomeScreen(): ReactElement {
             fixture={FEATURED}
             homeTeam={featuredHome}
             awayTeam={featuredAway}
-            onOpen={() => {
-              /* TODO: Phase 3 — router.push(`/fixture/${FEATURED.id}`) */
-            }}
+            onOpen={() => router.push(`/fixture/${FEATURED.id}`)}
           />
         ) : null}
 
@@ -164,9 +161,7 @@ export default function HomeScreen(): ReactElement {
                 item={r}
                 homeTeam={home}
                 awayTeam={away}
-                onPress={() => {
-                  /* TODO: Phase 3 — router.push(`/fixture/${r.id}`) */
-                }}
+                onPress={() => router.push(`/fixture/${r.id}`)}
               />
             );
           })}

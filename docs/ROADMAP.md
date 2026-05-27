@@ -9,9 +9,9 @@ The path from where we are to apps live in the App Store and Google Play. Update
 A user can:
 
 1. Open the app on iOS or Android, see today's fixtures with statistical signals visible at a glance.
-2. Tap any fixture and see deep research: a Summary view of strongest angles, a Matrix view of side-by-side comparative stats, and an AI brief.
-3. Search across fixtures, teams, players, referees using preset filters, custom criteria, or natural-language queries.
-4. Build a multi-leg "builder" — either manually by tapping `+` on Safe pills, or AI-assisted by asking for a builder for a fixture.
+2. Tap any fixture and see deep research: an Overview of strongest angles, Team stats and Player stats comparative grids, and a "The Count" brief.
+3. Search across fixtures, teams, players, referees using preset filters, custom criteria, or natural-language queries ("Ask The Count").
+4. Build a multi-leg "builder" — either manually by tapping `+` on Safe pills, or engine-assisted by asking The Count for a builder.
 5. Save builders, fixtures, and searches to a profile that persists across sessions.
 6. See the historical outcome of past saved builders (win/loss tracking against the data feed) — no real-money interaction, just history.
 
@@ -25,9 +25,11 @@ V1 must include: empty/loading/error states for every screen, age gate (17+ iOS,
 
 **Done:** Phases 0, 0.5, 1A, 1B, 1C, 2A, 2B. Foundation, design system, atomic primitives, app shell, full Dashboard. App boots on real iPhone via Expo Go with backdrop + glass panels + auto-advancing hero + 4-section content all rendering correctly. See PROJECT-STATE.md for detail.
 
-**Next:** Phase 3.
+**Next:** Phase 3 (Note Pad + Fixtures list + fixture detail route stub).
 
-**Remaining work to V1:** ~7 phases, of which 3 are UI-with-mock-data (fast), 2 are data infrastructure (slow), 1 is AI integration, plus polish/submission.
+**Remaining work to V1:** ~10 phases. Three are UI-with-mock-data (fixture-detail content split across Phases 3–5, plus Phase 7 search/builders), one is the pattern engine (Phase 6), three are data infrastructure (Phases 8–10), one is engine integration (Phase 11), one is polish + submission (Phase 12).
+
+The fixture-detail screen turned out larger than originally scoped. What was a single "Phase 3" (Summary / Matrix / AI tabs in one go) is now split into Phases 3, 4, 5 — Note Pad subsystem first, then the bulk of the tab content, then the engine-driven tab plus the tug-of-war back-fill.
 
 ---
 
@@ -37,86 +39,135 @@ Each phase is one Claude Code session unless flagged otherwise. Phases run seque
 
 ### Phase 2.5 — Sportmonks API spike
 
-Nick, manual, 1 hour. Sign up for Sportmonks, get a trial API key, hit 3–5 endpoints with `curl` or browser. Goal: confirm the data shapes Count needs actually exist. No code written. Notes captured for reference.
+Nick, manual, 1 hour. Sign up for Sportmonks, get a trial API key, hit 3–5 endpoints with `curl` or browser. Specific checks:
+
+- (a) **Historical fixture stats** accessible on trial, not just upcoming — the pattern engine needs season-long historical data.
+- (b) **League coverage** confirmed for the five MVP leagues: Premier League, EFL Championship, La Liga, Serie A, Bundesliga.
+- (c) **xG / xGoT on base Statistics include** — Sportmonks restructured to single-tier pricing in 2026; confirm xG is no longer a paid add-on and lands in the standard stats payload.
+
+No code written. Notes captured for reference.
 
 **Depends on:** nothing.
-**Output:** A short notes doc (`docs/sportmonks-spike.md`) summarising endpoint shapes and confirming assumptions.
+**Output:** A short notes doc (`docs/sportmonks-spike.md`) summarising endpoint shapes and confirming the three checks above.
 **Effort:** ~1 hour, Nick alone.
 **Parallelisable with:** Phase 3.
 
-### Phase 3 — Fixture detail screen
+### Phase 3 — Note Pad subsystem + Fixtures listing + fixture detail route stub
 
-The match research screen with three tabs: Summary (insight-led), Matrix (the signature side-by-side comparison view), AI (conversational placeholder). All against mock data. The Matrix view is the product's signature interaction — this is the most important screen.
+Build the NotePad context, provider, hook, sheet, and leg-row from scratch (Phase 2A shipped only the visual `NotePadBar` chrome — `pointerEvents="none"`, no state, no hook). Replace the Fixtures tab stub with the full `FixturesList` screen — date strip, comp filter, league-grouped fixture cards with addable Safe pills. Stand up `/fixture/[id]` as a route with the header, H1, and tab strip showing the four labels (**Overview · Team stats · Player stats · The Count**) — but no tab content yet, just a placeholder slot. Dashboard fixture-row `onPress` TODOs wire up to the new route.
+
+This is where the *first interactive addable mechanic* ships. Tapping a `+` Safe pill on a fixture card adds the leg to the Note Pad. The Note Pad bar shows the real count. Tapping the bar opens a sheet with all added legs and a clear-all + "Save to Builders" footer (Save stubbed to a toast until Phase 7).
 
 **Includes:**
-- The tug-of-war chart that was deferred from Phase 2B's featured-match panel. Source reference: `docs/design-source/the-count-v2/project/styles.css` `.tow / .tow-bar / .tow-row`.
-- `/fixture/[id]` route — every `onPress` TODO in `(tabs)/index.tsx` from Phase 2B currently points at this route.
+- `NotePadProvider` / `useNotePad` / `NotePadSheet` / `NotePadLegRow` (all new)
+- `SafePill` extension: new `leg?: Leg` prop adds Pressable + isInPad behaviour. Existing `addable?: boolean` prop kept for visual-only affordance (Dashboard `ResearchCard` continues to use it). Two separate concerns, both supported.
+- `FixturesList` + `FixtureLeagueSection` + `FixtureListCard` + `DateChip` + `CompChip` + `GlassSelect` (all new in `@count/ui`)
+- `Tab` + `TabStrip` primitives (new — used by the route stub here, fully consumed in Phase 4)
+- `/fixture/[id]` route stub (Expo Router)
+- Dashboard fixture-row `onPress` handlers wired to `router.push(/fixture/{id})`
+- Typed mock data port of `FIXTURES_ALL` from the design source
 
-**Brief discipline (lesson from Phase 2B):** The Matrix view is denser and more compound than anything in 2B. The 2B brief implied component flex/layout via "same as source" and Claude Code misread `ResearchCard`'s row-direction angle inset as column. For Phase 3, every compound component spec needs to state parent flex-direction, sibling order, and child sizing rules explicitly. Don't assume the agent can infer layout from the prototype.
+**Out of scope this phase:**
+- The four tab contents — Phase 4 (Overview / Team stats / Player stats) and Phase 5 (The Count).
+- The Save-to-Builders write flow — Phase 7.
+- Tug-of-war chart — Phase 5.
+- Date strip and filter chip aren't yet wired to filter data (visually selectable but no data filter applied).
 
 **Depends on:** Phase 2B. ✓ done.
-**Output:** Full fixture detail screen, navigable from a fixture row tap.
-**Effort:** 1–2 Claude Code sessions. The Matrix view alone is substantial.
+**Output:** Fixtures tab fully populated and tappable, Note Pad subsystem live, route stub navigable from Dashboard and Fixtures.
+**Effort:** 1 Claude Code session.
 
-### Phase 4 — Pattern engine against static data
+### Phase 4 — Fixture detail tab contents: Overview, Team stats, Player stats
+
+Three of the four tabs filled in:
+
+- **Overview:** hero panel with kits + form + kickoff + win-probability segmented bar, Strongest angles addable list, H2H + Referee two-up panel, "Build a builder for this fixture" CTA panel routing to The Count tab pre-filled with the chosen risk tier.
+- **Team stats:** window selector dropdown (L5 / L10 / L20 / Season), comparative grid with two stacked sides — home then away — each side has fixture column heads, scoreline pills, then category-grouped rows (ATTACK / SET PIECES / DISCIPLINE), each row with addable threshold pill on the left and 5 fixture-cell values with amber underline marks. Footer scroll hint + show-all toggle. xG / xGoT columns considered in the brief — they're in the Sportmonks base stats include now, so worth adding to the ATTACK category if the layout supports it.
+- **Player stats:** collapsible per-stat sections (Player fouls committed, Player shots on target, Player shots, Player to be fouled, Player tackles, Player cards), each section open shows home then away player rows with kit number square + name + addable threshold pill + 5 value cells.
+
+The Count tab remains a stub (placeholder under the tab content slot).
+
+**Brief discipline (lesson from Phase 2B):** The comparative-grid tabs are denser and more compound than anything yet shipped. The 2B brief implied component flex/layout via "same as source" and Claude Code misread `ResearchCard`'s row-direction angle inset as column. For Phase 4, every compound component spec needs to state parent flex-direction, sibling order, and child sizing rules explicitly. Don't assume the agent can infer layout from the prototype.
+
+**Depends on:** Phase 3 (Note Pad context, tab strip, route, addable Safe pills).
+**Output:** Three of four fixture-detail tabs working with mock data. Addable pills on each tab feed the Note Pad.
+**Effort:** 1–2 Claude Code sessions. Team stats grid alone is substantial.
+
+### Phase 5 — The Count tab + Dashboard tug-of-war back-fill
+
+The fourth tab. Three blocks:
+
+- **Fixture Preview** — multi-paragraph prose summary with inline coloured spans (teal for safe patterns, amber for headline pattern). Mock content this phase; Anthropic integration is Phase 11.
+- **Suggested Builder** — leg-count seg control (2 / 3 / 4 / 5 / 6), risk-tier seg control (Safe / Balanced), "Generate" CTA → result block with picked legs and computed combined implied probability. "Save to Builders" footer (still stubbed in this phase, real save in Phase 7).
+- **Fixture Intel** — "Available soon" skeleton panel as placeholder for line-up changes / injury / weather / opponent-adjusted form.
+
+Also slots the **tug-of-war chart** into the Dashboard featured-match panel (where it originally belonged before Phase 2B deferred it). Source reference: `docs/design-source/the-count-v2/project/components/tug-of-war.jsx` and the `.tow / .tow-bar / .tow-row` CSS blocks in `styles.css`.
+
+**Depends on:** Phase 4 (fixture detail shell + tabs).
+**Output:** Fixture detail complete on all four tabs with mock data. Dashboard featured panel gets the deferred visualisation.
+**Effort:** 1 Claude Code session.
+
+### Phase 6 — Pattern engine against static data
 
 Implement `@count/pattern-engine`. Pure TypeScript. Given a typed input (fixtures, events), produce typed outputs (hit rates, consistency scores, volatility, streaks, confidence ratings). Validate against a static historical dataset (e.g. one season of Premier League data, mocked or downloaded once from Sportmonks).
 
 **Why now:** the screens are built; we know exactly what outputs they consume. The engine isn't speculative.
 
-**Depends on:** Phases 2B + 3 (so we know what outputs are needed). Phase 2.5 ideally (so we know what input shapes Sportmonks delivers).
+**Depends on:** Phases 3, 4, 5 (so we know what outputs are needed). Phase 2.5 ideally (so we know what input shapes Sportmonks delivers).
 **Output:** A unit-tested deterministic engine that the mock data layer can adopt.
 **Effort:** 1 long Claude Code session. The engine maths matters more than the framing.
 
-### Phase 5 — Search + Builders screens
+### Phase 7 — Search + Builders screens (mock data)
 
-Search screen (preset filters, custom searches, AI search input placeholder). Builders screen (current builder being assembled, saved builders list, builder result detail with leg-by-leg outcome). All mock data.
+Search screen (preset filters, custom searches, "Ask The Count" natural-language input placeholder). Builders screen (current builder being assembled — surfaces what's in the Note Pad, saved builders list, builder result detail with leg-by-leg outcome).
 
-**Depends on:** Phases 2B and 3 (uses same primitives).
+**Save-to-Builders flow becomes real here.** The Phase 3 stubbed CTA now writes to a `builders` store and clears the Note Pad. The Builders screen reads from that store. Persistence is local-only (AsyncStorage) until Phase 8 brings Supabase in.
+
+**Depends on:** Phases 3 + 5 (uses Note Pad and shared primitives).
 **Output:** All 5 primary screens of the app are now navigable with mock data. App is feature-complete-looking, just not data-real.
 **Effort:** 1–2 Claude Code sessions.
 
 **At this point:** the app is demoable end-to-end on a phone. Could be shown to potential users for feedback before committing to real data.
 
-### Phase 6 — Supabase auth + schema
+### Phase 8 — Supabase auth + schema
 
-Create the Supabase project (Nick, one-time, EU-west region). Implement auth flows (Apple Sign In, Google, magic link). Design and migrate the schema for users, saved fixtures, saved builders, saved searches. Wire `@count/api` with typed client functions.
+Create the Supabase project (Nick, one-time, EU-west region). Implement auth flows (Apple Sign In, Google, magic link). Design and migrate the schema for users, saved fixtures, saved builders, saved searches. Wire `@count/api` with typed client functions. Migrate local-only Builders storage to Supabase.
 
-**Depends on:** Phases 2B–5 (knows what data needs persisting).
+**Depends on:** Phases 3–7 (knows what data needs persisting).
 **Output:** Real auth on real backend. Mock data still in use for fixtures/events; only user-owned data hits Supabase.
 **Effort:** 1–2 sessions. Auth flows are fiddly. Nick handles Supabase account + region setup.
 
-### Phase 7 — Sportmonks ingestion pipeline
+### Phase 9 — Sportmonks ingestion pipeline
 
 Edge Functions on Supabase that fetch from Sportmonks, transform to Count's typed domain shapes (via `@count/types`), upsert to Postgres. Scheduled to run on whatever cadence Sportmonks' rate limits allow. Includes back-fill of one season.
 
-**Depends on:** Phase 6 (needs Supabase). Phase 2.5 (needs spike findings).
+**Depends on:** Phase 8 (needs Supabase). Phase 2.5 (needs spike findings).
 **Output:** Real football data flowing into Postgres on a schedule.
 **Effort:** 1–2 sessions. Data transformation is the bulk; rate limiting and back-fill are real concerns.
 
-### Phase 8 — Wire real data into screens
+### Phase 10 — Wire real data into screens
 
 Replace mock data adapters with real `@count/api` calls everywhere. The mock layer becomes a fallback/dev mode. Loading and error states get fleshed out.
 
-**Depends on:** Phase 7 (data is in DB).
+**Depends on:** Phase 9 (data is in DB).
 **Output:** The app is real. Real fixtures, real signals from `@count/pattern-engine` against real data, real users.
 **Effort:** 1 session, but a long one — every screen touches data.
 
-### Phase 9 — Anthropic integration
+### Phase 11 — Anthropic integration for The Count
 
-AI-assisted builder generation. Natural-language search. Both routed through Supabase Edge Functions so the API key never lives in the client. Outputs are *always* grounded in deterministic data from the pattern engine — the AI explains and synthesises, it doesn't invent.
+Engine-assisted Suggested Builder generation. Natural-language search ("Ask The Count"). Both routed through Supabase Edge Functions so the API key never lives in the client. Outputs are *always* grounded in deterministic data from the pattern engine — The Count explains and synthesises, it doesn't invent.
 
-**Depends on:** Phase 8 (real data to ground the AI in).
-**Output:** The AI surfaces of the app become real.
+**Depends on:** Phase 10 (real data to ground the engine in).
+**Output:** The Count's intelligent surfaces become real.
 **Effort:** 1 session for the wiring, plus prompt engineering time that's hard to scope.
 
-### Phase 10 — Polish + submission
+### Phase 12 — Polish + submission
 
 Empty / loading / error states audited everywhere. Accessibility pass (VoiceOver, TalkBack, text scaling, contrast). Age gate. App Store / Play Store listing copy. Privacy policy. Terms. Test on multiple device sizes. App icons, splash screens, screenshots for store listings. EAS Build + EAS Submit configuration. First-submission shepherding through Apple's review (expect 2–3 weeks back-and-forth on a gambling-adjacent app).
 
-Includes deferred items: Android device pass (still pending from Phase 2A/2B), logo PNG re-export with proper glow bleed, font decision (Söhne licensed vs Inter).
+Includes deferred items: Android device pass (still pending from Phase 2A/2B and any earlier UI phase), logo PNG re-export with proper glow bleed, font decision (Söhne licensed vs Inter).
 
-**Depends on:** Phase 9 (everything else is done).
+**Depends on:** Phase 11 (everything else is done).
 **Output:** Live on App Store and Google Play.
 **Effort:** 2–4 weeks elapsed, including review time. Submission alone is unpredictable.
 
@@ -124,9 +175,9 @@ Includes deferred items: Android device pass (still pending from Phase 2A/2B), l
 
 ## Critical path
 
-Phases 3 → 4 → 5 are the remaining UI-and-engine track. Phases 6 → 7 → 8 are the data track. Phase 9 layers on top. Phase 10 is the gate.
+UI-and-engine track: Phases 3 → 4 → 5 → 6 → 7. Data track: Phases 8 → 9 → 10. The Count integration: Phase 11. Submission gate: Phase 12.
 
-The longest single-task risk is Apple review on the first submission. The longest single-phase risk is Phase 7 (ingestion pipeline — Sportmonks rate limits and data shape mismatches are real and hard to predict).
+The longest single-task risk is Apple review on the first submission. The longest single-phase risks are Phase 9 (ingestion pipeline — Sportmonks rate limits and data shape mismatches are real and hard to predict) and Phase 4 (the comparative-grid tabs — densest layout work in the codebase, where the Phase 2B "agent misreads layout direction" pattern would hurt most).
 
 Nothing else is fundamentally blocking.
 
@@ -138,6 +189,7 @@ These come up — we say no, until V1 ships and we've learned what users actuall
 
 - Web app of any kind (marketing site can wait; sign-up funnel is in the mobile app).
 - In-play / live data.
+- **Odds display.** Available as a Sportmonks add-on (€14–€69) but held back to keep V1 firmly positioned as "research and history journal" for App Store purposes. The `Leg` type carries a reserved `odds?` slot for V1.1; no V1 component reads or renders it. Target-builder odds feature ("build me a 3/1") becomes a V1.1 release lever.
 - Push notifications.
 - Sportsbook integration (deep linking, account linking, cash-out, etc.).
 - Social features (sharing builders, comments, follows).
@@ -154,6 +206,6 @@ After every shipped phase, this file gets updated:
 1. The phase moves from "remaining" to "done" — mark it complete in PROJECT-STATE.md too.
 2. If the phase taught us something that changes future phases, edit those phases' scope.
 3. If a new phase needs inserting (unknown unknowns surface), add it with a sensible number.
-4. Re-upload to the Claude project so future chats see the current version.
+4. **Re-upload both PROJECT-STATE.md and ROADMAP.md to the Claude project files panel** so future chats see the current version. The repo is the source of truth but chats only see what's in the panel.
 
 This is Nick's discipline to maintain. If a chat detects ROADMAP.md is stale (e.g. references phases we've talked about completing but it doesn't reflect), prompt to update.

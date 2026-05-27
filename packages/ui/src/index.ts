@@ -23,6 +23,47 @@ export { HScroll } from './components/HScroll';
 export { BottomNav, BOTTOM_NAV_Z_INDEX } from './components/BottomNav';
 export { NotePadBar, NOTE_PAD_BAR_Z_INDEX } from './components/NotePadBar';
 
+// Note Pad subsystem
+export {
+  NotePadContext,
+  NotePadProvider,
+  useNotePad,
+} from './context/NotePadContext';
+export type {
+  NotePadContextValue,
+  NotePadProviderProps,
+} from './context/NotePadContext';
+export {
+  NotePadSheet,
+  NOTE_PAD_SHEET_BACKDROP_Z_INDEX,
+  NOTE_PAD_SHEET_Z_INDEX,
+} from './components/NotePadSheet';
+export { NotePadLegRow } from './components/NotePadLegRow';
+export type { NotePadLegRowProps } from './components/NotePadLegRow';
+
+// Tabs (used by route stub now, full consumption in Phase 4)
+export { Tab } from './components/Tab';
+export { TabStrip } from './components/TabStrip';
+export type { TabProps } from './components/Tab';
+export type { TabStripProps, TabSpec } from './components/TabStrip';
+
+// Fixtures-list primitives + screen
+export { DateChip } from './components/DateChip';
+export { CompChip } from './components/CompChip';
+export { GlassSelect, GLASS_SELECT_DROPDOWN_Z_INDEX } from './components/GlassSelect';
+export { FixtureListCard } from './components/FixtureListCard';
+export { FixtureLeagueSection } from './components/FixtureLeagueSection';
+export { FixturesList } from './components/FixturesList';
+export type { DateChipProps } from './components/DateChip';
+export type { CompChipProps } from './components/CompChip';
+export type {
+  GlassSelectProps,
+  GlassSelectOption,
+} from './components/GlassSelect';
+export type { FixtureListCardProps } from './components/FixtureListCard';
+export type { FixtureLeagueSectionProps } from './components/FixtureLeagueSection';
+export type { FixturesListProps } from './components/FixturesList';
+
 // Dashboard composite components
 export { HeroCarousel } from './components/HeroCarousel';
 export { HeroDecor } from './components/HeroDecor';

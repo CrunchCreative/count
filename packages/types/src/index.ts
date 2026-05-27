@@ -5,3 +5,5 @@ export type { Team, TeamKit, KitPattern, FormResult } from './team';
 export type { FixtureSummary, SignalTier } from './fixture';
 export type { ResearchItem, ResearchAngle } from './research';
 export type { CarouselSlide, CarouselKind } from './carousel';
+export type { Leg, LegTier } from './leg';
+export type { FixtureListItem, FixturesByLeague } from './fixture-list';

@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import 'react-native-reanimated';
 
-import { RadialBackdrop } from '@count/ui';
+import { NotePadProvider, NotePadSheet, RadialBackdrop } from '@count/ui';
 import { colors } from '@count/tokens';
 
 export const unstable_settings = {
@@ -27,20 +27,26 @@ const TransparentDarkTheme: Theme = {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider value={TransparentDarkTheme}>
+    <NotePadProvider>
       <View style={{ flex: 1, backgroundColor: colors.bg.page }}>
         {/* Page-level chrome — sits behind every route, never blocks touches. */}
         <RadialBackdrop />
-        <Stack
-          screenOptions={{
-            contentStyle: { backgroundColor: 'transparent' },
-          }}
-        >
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-        </Stack>
+        <ThemeProvider value={TransparentDarkTheme}>
+          <Stack
+            screenOptions={{
+              contentStyle: { backgroundColor: 'transparent' },
+            }}
+          >
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="fixture/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+          </Stack>
+        </ThemeProvider>
+        {/* Note Pad sheet — absolute-positioned sibling, above all navigators.
+            Mounts always; renders nothing while closed (gotcha-free). */}
+        <NotePadSheet />
         <StatusBar style="light" />
       </View>
-    </ThemeProvider>
+    </NotePadProvider>
   );
 }
