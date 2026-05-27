@@ -13,6 +13,10 @@
 // scrolls (0 → 60px) the dark-glass surface fades in. The foreground row
 // (logo + profile icon) stays fully opaque throughout.
 //
+// Phase 3.6 follow-up: gradient overlay reduced to a faint highlight (was
+// near-opaque dark, now ~0.04 / 0.015 alpha) so the BlurView does the work
+// and the surface reads as translucent rather than solid dark.
+//
 // Animation runs on the native driver (opacity-only) via the shared
 // `useScrollY` Animated.Value, written by each tab screen's
 // `Animated.ScrollView.onScroll`.
@@ -87,18 +91,18 @@ export function AppHeader({
       ]}
       pointerEvents="box-none"
     >
-      {/* Background layer — BlurView + gradient + hairline, fades in with
-          scroll. Wrapped in an Animated.View so opacity affects the whole
-          stack including the BlurView's rendered output (BlurView itself
-          ignores `opacity` on its own style on iOS). pointerEvents=none so
-          taps still pass through to the foreground row. */}
+      {/* Background layer — BlurView + faint highlight gradient + hairline,
+          fades in with scroll. Wrapped in an Animated.View so opacity affects
+          the whole stack including the BlurView's rendered output (BlurView
+          itself ignores `opacity` on its own style on iOS). pointerEvents=none
+          so taps still pass through to the foreground row. */}
       <Animated.View
         pointerEvents="none"
         style={[StyleSheet.absoluteFillObject, { opacity: bgOpacity }]}
       >
         <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
         <LinearGradient
-          colors={['rgba(8,9,11,0.92)', 'rgba(8,9,11,0.78)']}
+          colors={['rgba(255,255,255,0.04)', 'rgba(255,255,255,0.015)']}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={StyleSheet.absoluteFill}
