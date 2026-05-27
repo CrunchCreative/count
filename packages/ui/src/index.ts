@@ -39,6 +39,13 @@ export type {
   NotePadContextValue,
   NotePadProviderProps,
 } from './context/NotePadContext';
+
+// Scroll subsystem — shared Animated.Value for header background animation
+export { ScrollProvider, useScrollY } from './context/ScrollContext';
+export type {
+  ScrollContextValue,
+  ScrollProviderProps,
+} from './context/ScrollContext';
 export {
   NotePadSheet,
   NOTE_PAD_SHEET_BACKDROP_Z_INDEX,

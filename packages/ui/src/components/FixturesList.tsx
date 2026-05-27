@@ -10,11 +10,12 @@
 // is real-data territory, out of scope this phase). Comp dropdown is wired.
 
 import { useMemo, useState, type ReactElement } from 'react';
-import { ScrollView, Text, View, type ViewStyle } from 'react-native';
+import { Animated, Text, View, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography } from '@count/tokens';
 import type { FixturesByLeague, Team } from '@count/types';
 import { APP_HEADER_CONTENT_HEIGHT } from './AppHeader';
+import { useScrollY } from '../context/ScrollContext';
 import { CompChip } from './CompChip';
 import { DateChip } from './DateChip';
 import { FixtureLeagueSection } from './FixtureLeagueSection';
@@ -47,6 +48,7 @@ export function FixturesList({
   onPressFilter,
 }: FixturesListProps): ReactElement {
   const insets = useSafeAreaInsets();
+  const scrollY = useScrollY();
   const [day, setDay] = useState('today');
   const [comp, setComp] = useState<string>(ALL_COMPS);
 
@@ -72,13 +74,18 @@ export function FixturesList({
   const filteringActive = comp !== ALL_COMPS;
 
   return (
-    <ScrollView
+    <Animated.ScrollView
       contentContainerStyle={{
         paddingHorizontal: PAGE_X,
         paddingTop: insets.top + APP_HEADER_CONTENT_HEIGHT + 16,
         paddingBottom: BOTTOM_SCROLL_PAD,
       }}
       showsVerticalScrollIndicator={false}
+      scrollEventThrottle={16}
+      onScroll={Animated.event(
+        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+        { useNativeDriver: true },
+      )}
     >
       {/* Header row */}
       <View style={headerRowStyle}>
@@ -134,7 +141,7 @@ export function FixturesList({
           />
         ))}
       </View>
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }
 

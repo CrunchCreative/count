@@ -10,7 +10,7 @@
 // for content breathing room.
 
 import type { ReactElement } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Animated, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import {
@@ -24,6 +24,7 @@ import {
   ResearchCard,
   ScanCard,
   SectionHead,
+  useScrollY,
 } from '@count/ui';
 import { colors, typography } from '@count/tokens';
 
@@ -37,17 +38,23 @@ const PAGE_X = 12;
 
 export default function HomeScreen(): ReactElement {
   const insets = useSafeAreaInsets();
+  const scrollY = useScrollY();
   const featuredHome = getTeam(FEATURED.home);
   const featuredAway = getTeam(FEATURED.away);
 
   return (
-    <ScrollView
+    <Animated.ScrollView
       contentContainerStyle={{
         paddingHorizontal: PAGE_X,
         paddingTop: insets.top + APP_HEADER_CONTENT_HEIGHT + 16,
         paddingBottom: 200,
       }}
       showsVerticalScrollIndicator={false}
+      scrollEventThrottle={16}
+      onScroll={Animated.event(
+        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+        { useNativeDriver: true },
+      )}
     >
       {/* Hero carousel */}
       <HeroCarousel slides={CAROUSEL} />
@@ -172,7 +179,7 @@ export default function HomeScreen(): ReactElement {
           </View>
         </View>
       </View>
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }
 
